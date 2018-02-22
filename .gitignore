@@ -1,3 +1,8 @@
 *.pyc
 *~
 *.kate-swp
+
+# Ignore all extras.
+/extras/*
+# Except keep folder.
+!/extras/.gitkeep
