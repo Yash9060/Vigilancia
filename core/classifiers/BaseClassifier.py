@@ -10,15 +10,12 @@ class BaseClassifier(object):
 
     def __init__(self):
         self._generate_model()
-        self._load_model_params()
+        self._restore_model_params()
     
-    def _load_model_params(self):
-        classifier_name = self._classifier_name
-        data_path = os.path.join(
-            vgconf.CLASSIFIER_DATA_PATH, self._classifier_name,
-            '%s.h5' % self._classifier_name)
-        self.load_model_params(data_path)
-        
+    def _get_data_path(self, file_name):
+        return os.path.join(
+            vgconf.CLASSIFIER_DATA_PATH, self._classifier_name, file_name)
+
     @abc.abstractmethod
     def _restore_model_params(self, classifier_data):
         """This method should be implemented by respective classes."""
@@ -38,3 +35,4 @@ class BaseClassifier(object):
     @abc.abstractmethod
     def predict(self, inputs):
         """This method performs and returns the prediction."""
+        pass

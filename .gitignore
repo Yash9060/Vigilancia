@@ -1,3 +1,14 @@
 *.pyc
 *~
 *.kate-swp
+.directory
+
+# Ignore all model weights and config files.
+*.weights
+*.cfg
+*.h5
+
+# Ignore all extras.
+/extras/*
+# Except keep folder.
+!/extras/.gitkeep
