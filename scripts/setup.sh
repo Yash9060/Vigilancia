@@ -3,12 +3,12 @@ echo "Checking necessary dependencies..."
 CURR_DIR=$(pwd)
 if [ ! -d $CURR_DIR/extras/darkflow ]; then
     echo "Downloading darkflow..."
-    wget https://github.com/prasanna08/darkflow/archive/master.zip -v -O $CURR_DIR/extras/master.zip
+    wget "https://github.com/prasanna08/darkflow/archive/master.zip" -v -O $CURR_DIR/extras/master.zip
     unzip $CURR_DIR/extras/master.zip -d $CURR_DIR/extras/
     mv $CURR_DIR/extras/darkflow-master $CURR_DIR/extras/darkflow
     rm $CURR_DIR/extras/master.zip
-    echo "Compiling darkflow inplace..."
     cd $CURR_DIR/extras/darkflow
+    # Compile darkflow.
     bash setup.sh
     cd $CURR_DIR
 fi;
@@ -25,3 +25,5 @@ if [ ! $version -eq 3 ]; then
 fi;
 
 export PYTHON_CMD
+source $(dirname $0)/metadata.sh
+source $(dirname $0)/data_downloader.sh
