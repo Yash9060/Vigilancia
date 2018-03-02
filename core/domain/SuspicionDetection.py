@@ -116,6 +116,7 @@ class SuspicionDetection(object):
         self.inception_sample_rate = rate
         self.sample_rate_lcm = self._get_sample_rate_lcm()
 
+    @async.synchronize(lock='_inception_buffer_lock')
     def _inception_callback(self, result):
         self.inception_buffer.append(result)
         if self.is_event_detector_on:
@@ -125,8 +126,7 @@ class SuspicionDetection(object):
                 self._activity_detector_inference(
                     self.inception_buffer[-self.activity_detector_length:])
 
-    @async.async_call(
-        callback=_inception_callback, lock='_inception_buffer_lock')
+    @async.async_call(callback=_inception_callback)
     def _inception_inference(self, frame):
         return self.inception.predict(frame)
 
@@ -136,11 +136,11 @@ class SuspicionDetection(object):
             return False
         return self.inception_buffer.pop(0)
 
+    @async.synchronize(lock='_yolo_buffer_lock')
     def _yolo_callback(self, result):
         self.yolo_buffer.append(result)
 
-    @async.async_call(
-        callback=_yolo_callback, lock='_yolo_buffer_lock')
+    @async.async_call(callback=_yolo_callback)
     def _yolo_inference(self, frame):
         return self.yolo.predict(frame)
 
@@ -150,12 +150,11 @@ class SuspicionDetection(object):
             return False
         return self.yolo_buffer.pop(0)
 
+    @async.synchronize(lock='_activity_detector_buffer_lock')
     def _activity_detector_callback(self, result):
         self.activity_detector_buffer.append(result)
 
-    @async.async_call(
-        callback=_activity_detector_callback,
-        lock='_activity_detector_buffer_lock')
+    @async.async_call(callback=_activity_detector_callback)
     def _activity_detector_inference(self, frames):
         return self.activity_detector.predict(frames)
 
@@ -165,12 +164,11 @@ class SuspicionDetection(object):
             return False
         return self.activity_detector_buffer.pop(0)
 
+    @async.synchronize(lock='_event_detector_buffer_lock')
     def _event_detector_callback(self, result):
         self.event_detector_buffer.append(result)
 
-    @async.async_call(
-        callback=_event_detector_callback,
-        lock='_event_detector_buffer_lock')
+    @async.async_call(callback=_event_detector_callback)
     def _event_detector_inference(self, frame):
         return self.event_detector.predict(frame)
 

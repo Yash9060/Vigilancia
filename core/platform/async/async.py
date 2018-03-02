@@ -38,15 +38,13 @@ class Async(object):
             pass
         return
 
-    def async_call(self, callback, lock):
+    def async_call(self, callback):
         async = self
         def _async_decorator(func):
             def _decorator(self, *args):
                 def _callback(result):
                     async.results.pop(0)
-                    async.acquire_lock(self, lock)
                     callback(self, result)
-                    async.release_lock(self, lock)
                 async.results.append(
                     async.pool.apply_async(
                         func, [self, *args], callback=_callback))
