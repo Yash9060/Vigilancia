@@ -31,8 +31,10 @@ echo "Inception weights are available locally"
 
 EVENT_DETECTOR_WGT=$CURR_DIR/data/classifiers/EventDetector
 echo "Checking Event Detector files..."
-if [ ! -d $EVENT_DETECTOR_WGT ]; then
-    mkdir $EVENT_DETECTOR_WGT
+if [ ! -f $EVENT_DETECTOR_WGT/EventDetector.h5 ]; then
+    if [ ! -d $EVENT_DETECTOR_WGT ]; then
+        mkdir $EVENT_DETECTOR_WGT
+    fi;
     wget "https://github.com/prasanna08/VigilanciaWeights/raw/master/EventDetector/EventDetector.h5" -O $EVENT_DETECTOR_WGT/EventDetector.h5
 fi;
 echo "Event Detector weights are available locally"

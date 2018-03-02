@@ -16,7 +16,7 @@ from core.platform.opencv import VideoStream
 # Detector. Turn ON classifiers.
 detector = SuspicionDetection.SuspicionDetection()
 detector.enable_unusual_activity_detection()
-stream = VideoStream.VideoStream(filename='Zombie Prank.mp4')
+stream = VideoStream.VideoStream(filename='../Zombie Prank.mp4')
 
 start = time.time()
 elapsed = 0
@@ -34,7 +34,7 @@ while stream.is_next_frame_available():
 
     elapsed += 1
     cv2.imshow('video', frame)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    if cv2.waitKey(1000 // 30) & 0xFF == ord('q'):
         break
 
 detector.close()
