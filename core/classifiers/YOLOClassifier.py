@@ -3,7 +3,7 @@ import json
 import os
 
 from core.classifiers import BaseClassifier
-from core.platform.YOLO import yolo
+from core.platform.yolo import yolo
 import vgconf
 
 class YOLO(BaseClassifier.BaseClassifier):

@@ -20,3 +20,29 @@ if [ "$PREFERRED_YOLO_MODEL" = "Tiny YOLO" ]; then
     
     echo "Tiny YOLO model is available locally"
 fi;
+
+INCEPTION_WGT=$CURR_DIR/data/classifiers/Inception
+echo "Checking Inception files..."
+if [ ! -d $INCEPTION_WGT ]; then
+    mkdir $INCEPTION_WGT
+    wget "https://github.com/prasanna08/VigilanciaWeights/raw/master/Inception/Inception.pb" -O $INCEPTION_WGT/Inception.pb
+fi;
+echo "Inception weights are available locally"
+
+EVENT_DETECTOR_WGT=$CURR_DIR/data/classifiers/EventDetector
+echo "Checking Event Detector files..."
+if [ ! -f $EVENT_DETECTOR_WGT/EventDetector.h5 ]; then
+    if [ ! -d $EVENT_DETECTOR_WGT ]; then
+        mkdir $EVENT_DETECTOR_WGT
+    fi;
+    wget "https://github.com/prasanna08/VigilanciaWeights/raw/master/EventDetector/EventDetector.h5" -O $EVENT_DETECTOR_WGT/EventDetector.h5
+fi;
+echo "Event Detector weights are available locally"
+
+UNUSUAL_ACTIVITY_DETECTOR_WGT=$CURR_DIR/data/classifiers/UnusualActivityDetector
+echo "Checking Unusual Activity Detector files..."
+if [ ! -d $UNUSUAL_ACTIVITY_DETECTOR_WGT ]; then
+    mkdir $UNUSUAL_ACTIVITY_DETECTOR_WGT
+    wget "https://github.com/prasanna08/VigilanciaWeights/raw/master/UnusualActivityDetector/UnusualActivityDetector.h5" -O $UNUSUAL_ACTIVITY_DETECTOR_WGT/UnusualActivityDetector.h5
+fi;
+echo "Unusual Activity Detector weights are available locally"

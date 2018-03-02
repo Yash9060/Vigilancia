@@ -9,3 +9,8 @@ EXTRAS_PATH = os.path.join(VIGILANCIA_PATH, 'extras')
 
 # Extra module names.
 DARKFLOW_MODULE_NAME = 'darkflow'
+
+# Default values.
+DEFAULT_YOLO_SAMPLE_RATE = 5
+DEFAULT_INCEPTION_SAMPLE_RATE = 15
+ACTIVITY_DETECTOR_LENGTH = 4

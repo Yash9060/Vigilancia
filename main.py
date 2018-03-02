@@ -7,39 +7,38 @@ vg_config.init()
 # Start other things.
 import cv2
 import time
+import sys
 
 # Just sanity check.
-from core.classifiers import YOLOClassifier
+from core.domain import SuspicionDetection
+from core.platform.opencv import VideoStream
 
-# Generate YOLO model.
-yolo = YOLOClassifier.YOLO()
-cap = cv2.VideoCapture(0)
+# Detector. Turn ON classifiers.
+detector = SuspicionDetection.SuspicionDetection()
+detector.enable_unusual_activity_detection()
+stream = VideoStream.VideoStream(filename='../Zombie Prank.mp4')
 
-elapsed = 0
-sample_rate = 5
-preds = []
 start = time.time()
+elapsed = 0
 
-while True:
-    ret, frame = cap.read()
-    
-    if elapsed % sample_rate == 0:
+while stream.is_next_frame_available():
+    frame = stream.read_next_frame()
+    detector.detect(frame)
+    if elapsed % 5 == 0:
         sys.stdout.write('\r')
-        sys.stdout.write('%.3f FPS' % (elapsed / (time.time() - start)))
+        preds = detector.get_activity_detector_prediction()
+        if preds:
+            print('Event: ' + str(preds[0]))
+        sys.stdout.write(' %.3f FPS' % (elapsed / (time.time() - start)))
         sys.stdout.flush()
-        preds = yolo.predict(frame)
-    
-    for pred in preds:
-        cv2.rectangle(
-            frame, (pred['topleft']['x'], pred['topleft']['y']),
-            (pred['bottomright']['x'], pred['bottomright']['y']),
-            (0, 255, 0), 1)
+
     elapsed += 1
     cv2.imshow('video', frame)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    if cv2.waitKey(1000 // 30) & 0xFF == ord('q'):
         break
 
-cap.release()
+detector.close()
+stream.close()
 cv2.destroyAllWindows()
 
 print('\nHappy to Help!')
