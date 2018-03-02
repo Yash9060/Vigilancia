@@ -1,0 +1,655 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1037</width>
+    <height>563</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Vigilancia</string>
+  </property>
+  <property name="autoFillBackground">
+   <bool>false</bool>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.897561 rgba(0, 30, 58, 255), stop:1 rgba(0, 181, 174, 255))</string>
+  </property>
+  <property name="animated">
+   <bool>true</bool>
+  </property>
+  <property name="unifiedTitleAndToolBarOnMac">
+   <bool>false</bool>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QGraphicsView" name="Video_Window">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>110</y>
+      <width>401</width>
+      <height>311</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: white;
+background-color: lightgray;
+</string>
+    </property>
+    <property name="interactive">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QProgressBar" name="progressBar">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>80</y>
+      <width>118</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: white;
+background-color: rgba(0, 0, 0, 0);</string>
+    </property>
+    <property name="value">
+     <number>24</number>
+    </property>
+    <property name="textVisible">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QSlider" name="sld_Object_detection">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>700</x>
+      <y>170</y>
+      <width>31</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QSlider::handle:horizontal {
+background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+    stop:0 #eee, stop:1 #ccc);
+border: 1px solid #777;
+width: 4px;
+border-radius: 10px;
+}
+
+QSlider::add-page:qlineargradient {
+background: lightgrey;
+border-radius: 9px;
+}
+
+
+QSlider{
+background-color: rgba(0, 0, 0, 0);
+}</string>
+    </property>
+    <property name="maximum">
+     <number>1</number>
+    </property>
+    <property name="pageStep">
+     <number>1</number>
+    </property>
+    <property name="value">
+     <number>1</number>
+    </property>
+    <property name="tracking">
+     <bool>true</bool>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+    <property name="invertedAppearance">
+     <bool>false</bool>
+    </property>
+    <property name="invertedControls">
+     <bool>false</bool>
+    </property>
+    <property name="tickPosition">
+     <enum>QSlider::NoTicks</enum>
+    </property>
+    <property name="tickInterval">
+     <number>1</number>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="Start">
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>440</y>
+      <width>91</width>
+      <height>34</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>DejaVu Sans Mono</family>
+      <pointsize>11</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton:hover {
+background-color: rgba(0, 0, 0, 0.2);
+}
+QPushButton {color: white;
+background-color: rgba(0, 0, 0, 0);
+border: 1px solid white;
+}
+</string>
+    </property>
+    <property name="text">
+     <string>Start</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_ObjectDetection">
+    <property name="geometry">
+     <rect>
+      <x>510</x>
+      <y>170</y>
+      <width>171</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>DejaVu Sans Mono</family>
+      <pointsize>11</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: white;
+background-color: rgba(0, 0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string>Object Detection</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_Event_Detection">
+    <property name="geometry">
+     <rect>
+      <x>510</x>
+      <y>280</y>
+      <width>171</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>DejaVu Sans Mono</family>
+      <pointsize>11</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: white;
+background-color: rgba(0, 0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string>Event Detecion</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_Abnormal_Activity">
+    <property name="geometry">
+     <rect>
+      <x>510</x>
+      <y>390</y>
+      <width>171</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>DejaVu Sans Mono</family>
+      <pointsize>11</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: white;
+background-color: rgba(0, 0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string>Abnormal Activity</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_Classifier">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>100</y>
+      <width>221</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>DejaVu Sans Mono</family>
+      <pointsize>13</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+      <kerning>false</kerning>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: white;
+background-color: rgba(0, 0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string>Classifiers</string>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::RichText</enum>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_Predictions">
+    <property name="geometry">
+     <rect>
+      <x>770</x>
+      <y>100</y>
+      <width>221</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>DejaVu Sans Mono</family>
+      <pointsize>13</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+      <kerning>false</kerning>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: white;
+background-color: rgba(0, 0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string>Predictions</string>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::RichText</enum>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="Label_Vigilanci_Title">
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>9</y>
+      <width>781</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>DejaVu Sans Mono</family>
+      <pointsize>28</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: white;
+background-color: rgba(255, 255, 255, 0)</string>
+    </property>
+    <property name="text">
+     <string>Vigilancia</string>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::RichText</enum>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_FileName">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>110</y>
+      <width>401</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>DejaVu Sans Mono</family>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: white;
+background-color: rgba(0, 30, 58, 150);</string>
+    </property>
+    <property name="text">
+     <string>stream / file name</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QSlider" name="sld_Event_detection">
+    <property name="geometry">
+     <rect>
+      <x>700</x>
+      <y>280</y>
+      <width>31</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QSlider::handle:horizontal {
+background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+    stop:0 #eee, stop:1 #ccc);
+border: 1px solid #777;
+width: 4px;
+margin-top: -2px;
+margin-bottom: -2px;
+border-radius: 10px;
+}
+QSlider::add-page:qlineargradient {
+background: lightgrey;
+border-top-right-radius: 9px;
+border-bottom-right-radius: 9px;
+border-top-left-radius: 0px;
+border-bottom-left-radius: 0px;
+}
+
+QSlider{
+background-color: rgba(0, 0, 0, 0);
+}</string>
+    </property>
+    <property name="maximum">
+     <number>1</number>
+    </property>
+    <property name="pageStep">
+     <number>1</number>
+    </property>
+    <property name="value">
+     <number>0</number>
+    </property>
+    <property name="tracking">
+     <bool>true</bool>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+    <property name="invertedAppearance">
+     <bool>false</bool>
+    </property>
+    <property name="invertedControls">
+     <bool>false</bool>
+    </property>
+    <property name="tickPosition">
+     <enum>QSlider::NoTicks</enum>
+    </property>
+    <property name="tickInterval">
+     <number>1</number>
+    </property>
+   </widget>
+   <widget class="QSlider" name="sld_Abnormal_Activity">
+    <property name="geometry">
+     <rect>
+      <x>700</x>
+      <y>390</y>
+      <width>31</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QSlider{
+background-color: rgba(0, 0, 0, 0);
+}
+
+QSlider::handle:horizontal {
+background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+    stop:0 #eee, stop:1 #ccc);
+border: 1px solid #777;
+width: 4px;
+margin-top: -2px;
+margin-bottom: -2px;
+border-radius: 10px;
+}
+
+QSlider::add-page:qlineargradient {
+background: lightgrey;
+border-top-right-radius: 9px;
+border-bottom-right-radius: 9px;
+border-top-left-radius: 0px;
+border-bottom-left-radius: 0px;
+}</string>
+    </property>
+    <property name="maximum">
+     <number>1</number>
+    </property>
+    <property name="pageStep">
+     <number>1</number>
+    </property>
+    <property name="value">
+     <number>0</number>
+    </property>
+    <property name="tracking">
+     <bool>true</bool>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+    <property name="invertedAppearance">
+     <bool>false</bool>
+    </property>
+    <property name="invertedControls">
+     <bool>false</bool>
+    </property>
+    <property name="tickPosition">
+     <enum>QSlider::NoTicks</enum>
+    </property>
+    <property name="tickInterval">
+     <number>1</number>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="File_Seletcion">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>440</y>
+      <width>301</width>
+      <height>34</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>DejaVu Sans Mono</family>
+      <pointsize>11</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton:hover {
+background-color: rgba(0, 0, 0, 0.2);
+}
+QPushButton {color: white;
+background-color: rgba(0, 0, 0, 0);
+border: 1px solid white;
+}
+</string>
+    </property>
+    <property name="text">
+     <string>Select file to stream</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_DateTime">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>80</y>
+      <width>271</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>DejaVu Sans Mono</family>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: white;
+background-color: rgba(0, 0, 0, 0);
+border: 1px solid white;</string>
+    </property>
+    <property name="text">
+     <string>Today's date and time</string>
+    </property>
+   </widget>
+   <widget class="QGraphicsView" name="graphicsView_2">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>101</y>
+      <width>421</width>
+      <height>331</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(186, 46, 46, 1)</string>
+    </property>
+    <property name="backgroundBrush">
+     <brush brushstyle="SolidPattern">
+      <color alpha="255">
+       <red>255</red>
+       <green>0</green>
+       <blue>0</blue>
+      </color>
+     </brush>
+    </property>
+    <property name="foregroundBrush">
+     <brush brushstyle="SolidPattern">
+      <color alpha="255">
+       <red>255</red>
+       <green>0</green>
+       <blue>0</blue>
+      </color>
+     </brush>
+    </property>
+    <property name="sceneRect">
+     <rectf>
+      <x>0.000000000000000</x>
+      <y>0.000000000000000</y>
+      <width>0.000000000000000</width>
+      <height>0.000000000000000</height>
+     </rectf>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="plainTextEdit_2">
+    <property name="geometry">
+     <rect>
+      <x>790</x>
+      <y>270</y>
+      <width>231</width>
+      <height>84</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(0, 0, 0, 0);
+color: white;
+border: 1px solid white;
+border-radius: 4px;</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+    <property name="plainText">
+     <string>Event
+</string>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="plainTextEdit_3">
+    <property name="geometry">
+     <rect>
+      <x>790</x>
+      <y>160</y>
+      <width>231</width>
+      <height>84</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(0, 0, 0, 0);
+color: white;
+border: 1px solid white;
+border-radius: 4px;</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+    <property name="plainText">
+     <string>Objects</string>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="plainTextEdit_4">
+    <property name="geometry">
+     <rect>
+      <x>790</x>
+      <y>380</y>
+      <width>231</width>
+      <height>84</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(0, 0, 0, 0);
+color: white;
+border: 1px solid white;
+border-radius: 4px;</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+    <property name="plainText">
+     <string>Activity</string>
+    </property>
+   </widget>
+   <zorder>graphicsView_2</zorder>
+   <zorder>Video_Window</zorder>
+   <zorder>progressBar</zorder>
+   <zorder>sld_Object_detection</zorder>
+   <zorder>Start</zorder>
+   <zorder>label_ObjectDetection</zorder>
+   <zorder>label_Event_Detection</zorder>
+   <zorder>label_Abnormal_Activity</zorder>
+   <zorder>label_Classifier</zorder>
+   <zorder>label_Predictions</zorder>
+   <zorder>Label_Vigilanci_Title</zorder>
+   <zorder>label_FileName</zorder>
+   <zorder>sld_Event_detection</zorder>
+   <zorder>sld_Abnormal_Activity</zorder>
+   <zorder>File_Seletcion</zorder>
+   <zorder>label_DateTime</zorder>
+   <zorder>plainTextEdit_2</zorder>
+   <zorder>plainTextEdit_3</zorder>
+   <zorder>plainTextEdit_4</zorder>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
