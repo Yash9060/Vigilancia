@@ -53,7 +53,7 @@ class DisplayScreen(object):
         self.abnormal_activity_slider_geometry = (700, 390, 31, 20)
 
         self.push_button_stylesheet = ('QPushButton:hover {\n'
-            'background-color: rgba(255, 255, 255, 111);\n'
+            'background-color: rgba(255, 255, 255, 50);\n'
             '}\n'
             'QPushButton {\n'
             'color: white;\n'
