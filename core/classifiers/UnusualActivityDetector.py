@@ -3,6 +3,7 @@ from keras import layers, models
 import numpy as np
 
 from core.classifiers import BaseClassifier
+import vgconf
 
 class UnusualActivityDetector(BaseClassifier.BaseClassifier):
     def __init__(self):
@@ -18,6 +19,13 @@ class UnusualActivityDetector(BaseClassifier.BaseClassifier):
             optimizer='adam', loss='binary_crossentropy',
             metrics=['accuracy'])
 
+    def get_class_name(self, predictions):
+        prediction = predictions[0]
+        if prediction > vgconf.ACTIVITY_DETECTION_THRESHOLD:
+            return 'Abnormal Activity'
+        else:
+            return 'Normal Activity'
+
     def _restore_model_params(self):
         self.model.load_weights(self._get_data_path(self.weights_file))
 
@@ -26,4 +34,5 @@ class UnusualActivityDetector(BaseClassifier.BaseClassifier):
         return 'UnusualActivityDetector'
 
     def predict(self, frame):
-        return self.model.predict(np.expand_dims(frame, 0))[0]
+        predictions = self.model.predict(np.expand_dims(frame, 0))[0]
+        return self.get_class_name(predictions)
