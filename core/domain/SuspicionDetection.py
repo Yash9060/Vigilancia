@@ -81,31 +81,55 @@ class SuspicionDetection(object):
         x = self.yolo.predict(random_input)
         self.is_yolo_on = True
 
-    def _remove_event_detector(self):
-        # How to do this ???
-        pass
-
     def _remove_inception(self):
         pass
 
+    def _remove_event_detector(self):
+        if not self.is_activity_detector_on:
+            self._remove_inception()
+        pass
+
     def _remove_unusual_activity_detector(self):
+        if not self.is_event_detector_on:
+            self._remove_inception()
         pass
 
     def _remove_yolo_classifier(self):
         pass
 
     def enable_unusual_activity_detection(self):
+        if self.is_activity_detector_on:
+            return
         if not self.is_inception_on:
             self._get_inception()
         self._get_unusual_activity_detector()
 
     def enable_event_detection(self):
+        if self.is_event_detector_on:
+            return
         if not self.is_inception_on:
             self._get_inception()
         self._get_event_detector()
 
     def enable_yolo_detection(self):
+        if self.is_yolo_on:
+            return
         self._get_yolo_classifier()
+
+    def disable_unusual_activity_detection(self):
+        if not self.is_activity_detector_on:
+            return
+        self._remove_unusual_activity_detector()
+
+    def disable_event_detection(self):
+        if not self.is_event_detector_on:
+            return
+        self._remove_event_detector()
+
+    def disable_yolo_detection(self):
+        if not self.is_yolo_on:
+            return
+        self._remove_yolo_classifier()
 
     def set_yolo_sample_rate(self, rate):
         self.yolo_sample_rate = rate
@@ -133,7 +157,7 @@ class SuspicionDetection(object):
     @async.synchronize(lock='_inception_buffer_lock')
     def get_inception_prediction(self):
         if not self.inception_buffer:
-            return False
+            return []
         return self.inception_buffer.pop(0)
 
     @async.synchronize(lock='_yolo_buffer_lock')
@@ -147,7 +171,7 @@ class SuspicionDetection(object):
     @async.synchronize(lock='_yolo_buffer_lock')
     def get_yolo_prediction(self):
         if not self.yolo_buffer:
-            return False
+            return []
         return self.yolo_buffer.pop(0)
 
     @async.synchronize(lock='_activity_detector_buffer_lock')
@@ -161,7 +185,7 @@ class SuspicionDetection(object):
     @async.synchronize(lock='_activity_detector_buffer_lock')
     def get_activity_detector_prediction(self):
         if not self.activity_detector_buffer:
-            return False
+            return None
         return self.activity_detector_buffer.pop(0)
 
     @async.synchronize(lock='_event_detector_buffer_lock')
@@ -175,7 +199,7 @@ class SuspicionDetection(object):
     @async.synchronize(lock='_event_detector_buffer_lock')
     def get_event_detector_prediction(self):
         if not self.event_detector_buffer:
-            return False
+            return []
         return self.event_detector_buffer.pop(0)
 
     def detect(self, frame):
