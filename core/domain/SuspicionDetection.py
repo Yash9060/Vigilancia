@@ -13,6 +13,10 @@ class SuspicionDetection(object):
     async = async.Async()
 
     def __init__(self):
+        self.yolo_inference_buffer = []
+        self.inception_inference_buffer = []
+        self.activity_detector_inference_buffer = []
+        self.event_detector_inference_buffer = []
         self.yolo_buffer = []
         self.inception_buffer = []
         self.activity_detector_buffer = []
@@ -110,7 +114,6 @@ class SuspicionDetection(object):
     def set_yolo_sample_rate(self, rate):
         self.yolo_sample_rate = rate
         self.sample_rate_lcm = self._get_sample_rate_lcm()
-        return True
 
     def set_inception_sample_rate(self, rate):
         self.inception_sample_rate = rate
@@ -119,73 +122,117 @@ class SuspicionDetection(object):
     @async.synchronize(lock='_inception_buffer_lock')
     def _inception_callback(self, result):
         self.inception_buffer.append(result)
+        if len(self.inception_buffer) > self.activity_detector_length:
+            self.inception_buffer.pop(0)
         if self.is_event_detector_on:
-            self._event_detector_inference(self.inception_buffer[-1])
+            self.perform_event_detector_inference(self.inception_buffer[-1])
         if self.is_activity_detector_on:
             if len(self.inception_buffer) >= self.activity_detector_length:
-                self._activity_detector_inference(
+                self.perform_activity_detector_inference(
                     self.inception_buffer[-self.activity_detector_length:])
 
     @async.async_call(callback=_inception_callback)
-    def _inception_inference(self, frame):
-        return self.inception.predict(frame)
+    def _inception_inference(self):
+        if not self.inception_inference_buffer:
+            return
+        return self.inception.predict(self.inception_inference_buffer.pop(0))
+
+    def perform_inception_inference(self, frame):
+        self.inception_inference_buffer.append(frame)
+        if len(self.inception_inference_buffer) > 1:
+            self.inception_inference_buffer.pop(0)
+        return self._inception_inference()
 
     @async.synchronize(lock='_inception_buffer_lock')
     def get_inception_prediction(self):
         if not self.inception_buffer:
             return []
-        return self.inception_buffer.pop(0)
+        return self.inception_buffer[-1]
 
     @async.synchronize(lock='_yolo_buffer_lock')
     def _yolo_callback(self, result):
+        if not result:
+            return
         self.yolo_buffer.append(result)
+        if len(self.yolo_buffer) > 1:
+            self.yolo_buffer.pop(0)
 
     @async.async_call(callback=_yolo_callback)
-    def _yolo_inference(self, frame):
-        return self.yolo.predict(frame)
+    def _yolo_inference(self):
+        if not self.yolo_inference_buffer:
+            return
+        return self.yolo.predict(self.yolo_inference_buffer.pop(0))
+
+    def perform_yolo_inference(self, frame):
+        self.yolo_inference_buffer.append(frame)
+        if len(self.yolo_inference_buffer) > 1:
+            self.yolo_inference_buffer.pop(0)
+        return self._yolo_inference()
 
     @async.synchronize(lock='_yolo_buffer_lock')
     def get_yolo_prediction(self):
         if not self.yolo_buffer:
             return []
-        return self.yolo_buffer.pop(0)
+        return self.yolo_buffer[-1]
 
     @async.synchronize(lock='_activity_detector_buffer_lock')
     def _activity_detector_callback(self, result):
         self.activity_detector_buffer.append(result)
+        if len(self.activity_detector_buffer) > 1:
+            self.activity_detector_buffer.pop(0)
 
     @async.async_call(callback=_activity_detector_callback)
-    def _activity_detector_inference(self, frames):
-        return self.activity_detector.predict(frames)
+    def _activity_detector_inference(self):
+        if not self.activity_detector_inference_buffer:
+            return
+        return self.activity_detector.predict(
+            self.activity_detector_inference_buffer.pop(0))
+
+    def perform_activity_detector_inference(self, frames):
+        self.activity_detector_inference_buffer.append(frames)
+        if len(self.activity_detector_inference_buffer) > 1:
+            self.activity_detector_inference_buffer.pop(0)
+        return self._activity_detector_inference()
 
     @async.synchronize(lock='_activity_detector_buffer_lock')
     def get_activity_detector_prediction(self):
         if not self.activity_detector_buffer:
             return None
-        return self.activity_detector_buffer.pop(0)
+        return self.activity_detector_buffer[-1]
 
     @async.synchronize(lock='_event_detector_buffer_lock')
     def _event_detector_callback(self, result):
         self.event_detector_buffer.append(result)
+        if len(self.event_detector_buffer) > 1:
+            self.event_detector_buffer.pop(0)
 
     @async.async_call(callback=_event_detector_callback)
-    def _event_detector_inference(self, frame):
-        return self.event_detector.predict(frame)
+    def _event_detector_inference(self):
+        if not self.event_detector_inference_buffer:
+            return
+        return self.event_detector.predict(
+            self.event_detector_inference_buffer.pop(0))
+
+    def perform_event_detector_inference(self, frame):
+        self.event_detector_inference_buffer.append(frame)
+        if len(self.event_detector_inference_buffer) > 1:
+            self.event_detector_inference_buffer.pop(0)
+        return self._event_detector_inference()
 
     @async.synchronize(lock='_event_detector_buffer_lock')
     def get_event_detector_prediction(self):
         if not self.event_detector_buffer:
             return []
-        return self.event_detector_buffer.pop(0)
+        return self.event_detector_buffer[-1]
 
     def detect(self, frame):
         if self.is_yolo_on:
             if self.count % self.yolo_sample_rate == 0:
-                self._yolo_inference(frame)
+                self.perform_yolo_inference(frame)
 
         if self.is_event_detector_on or self.is_activity_detector_on:
             if self.count % self.inception_sample_rate == 0:
-                self._inception_inference(frame)
+                self.perform_inception_inference(frame)
 
         self.count += 1
         if self.count == self.sample_rate_lcm:

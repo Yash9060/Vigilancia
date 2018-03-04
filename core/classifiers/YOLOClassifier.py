@@ -8,11 +8,11 @@ import vgconf
 
 class YOLO(BaseClassifier.BaseClassifier):
     def __init__(self):
-        self.config_file = 'yolo.json'
+        self.config_file = ('%s.json' % vgconf.DEFAULT_YOLO_CLASSIFIER)
         self.yolo_options = {
             'gpu': 1.0,
             'gpuName': '/device:GPU:0',
-            'threshold': 0.25,
+            'threshold': vgconf.YOLO_THRESHOLD,
             'config': os.path.join(
                 vgconf.EXTRAS_PATH, vgconf.DARKFLOW_MODULE_NAME, 'cfg')
         }
