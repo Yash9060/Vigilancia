@@ -15,9 +15,9 @@ from core.platform.opencv import VideoStream
 
 # Detector. Turn ON classifiers.
 detector = SuspicionDetection.SuspicionDetection()
-detector.enable_event_detection()
-stream = VideoStream.VideoStream(filename='../Zombie Prank.mp4')
-
+detector.enable_unusual_activity_detection()
+stream = VideoStream.VideoStream(filename='../Crowd-Activity-All.avi')
+preds = []
 start = time.time()
 elapsed = 0
 
@@ -26,11 +26,17 @@ while stream.is_next_frame_available():
     detector.detect(frame)
     if elapsed % 5 == 0:
         sys.stdout.write('\r')
-        preds = detector.get_event_detector_prediction()
+        preds = detector.get_activity_detector_prediction()
         if preds:
             print('Event: ', preds)
         sys.stdout.write(' %.3f FPS' % (elapsed / (time.time() - start)))
         sys.stdout.flush()
+
+    #for pred in preds:
+    #    cv2.rectangle(
+    #        frame, (pred['topleft']['x'], pred['topleft']['y']),
+    #        (pred['bottomright']['x'], pred['bottomright']['y']),
+    #        (0, 255, 0), 1)
 
     elapsed += 1
     cv2.imshow('video', frame)

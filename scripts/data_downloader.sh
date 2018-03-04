@@ -9,7 +9,7 @@ if [ "$PREFERRED_YOLO_MODEL" = "Tiny YOLO" ]; then
     YOLO_CFG=$CURR_DIR/data/classifiers/YOLO/tiny-yolo-coco.cfg
     if [ ! -f $YOLO_CFG ]; then
         echo "Downloading Tiny YOLO config file..."
-        wget "https://github.com/pjreddie/darknet/blob/master/cfg/tiny-yolo.cfg" -O $YOLO_CFG
+        wget "https://github.com/pjreddie/darknet/raw/master/cfg/tiny-yolo.cfg" -O $YOLO_CFG
     fi;
 
     YOLO_WGT=$CURR_DIR/data/classifiers/YOLO/tiny-yolo-coco.weights
@@ -19,6 +19,24 @@ if [ "$PREFERRED_YOLO_MODEL" = "Tiny YOLO" ]; then
     fi;
     
     echo "Tiny YOLO model is available locally"
+fi;
+
+if [ "$PREFERRED_YOLO_MODEL" = "YOLO" ]; then
+    echo "Checking YOLO files..."
+
+    YOLO_CFG=$CURR_DIR/data/classifiers/YOLO/yolo-coco.cfg
+    if [ ! -f $YOLO_CFG ]; then
+        echo "Downloading YOLO config file..."
+        wget "https://github.com/pjreddie/darknet/raw/master/cfg/yolo.cfg" -O $YOLO_CFG
+    fi;
+
+    YOLO_WGT=$CURR_DIR/data/classifiers/YOLO/yolo-coco.weights
+    if [ ! -f $YOLO_WGT ]; then
+        echo "Downloading YOLO weights file..."
+        wget "https://pjreddie.com/media/files/yolo.weights" -O $YOLO_WGT
+    fi;
+    
+    echo "YOLO model is available locally"
 fi;
 
 INCEPTION_WGT=$CURR_DIR/data/classifiers/Inception

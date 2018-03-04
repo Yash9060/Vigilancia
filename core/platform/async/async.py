@@ -45,9 +45,10 @@ class Async(object):
                 def _callback(result):
                     async.results.pop(0)
                     callback(self, result)
-                async.results.append(
-                    async.pool.apply_async(
-                        func, [self, *args], callback=_callback))
+                res = async.pool.apply_async(
+                    func, [self, *args], callback=_callback)
+                async.results.append(res)
+                return res
             return wraps(func)(_decorator)
         return _async_decorator
 
