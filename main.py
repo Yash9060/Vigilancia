@@ -16,6 +16,7 @@ from core.platform.opencv import VideoStream
 # Detector. Turn ON classifiers.
 detector = SuspicionDetection.SuspicionDetection()
 detector.enable_yolo_detection()
+detector.enable_unusual_activity_detection()
 stream = VideoStream.VideoStream(filename='../Crowd-Activity-All.avi')
 preds = []
 start = time.time()
@@ -26,9 +27,9 @@ while stream.is_next_frame_available():
     detector.detect(frame)
     if elapsed % 5 == 0:
         sys.stdout.write('\r')
-        #preds = detector.get_activity_detector_prediction()
-        #if preds:
-        #    print('Event: ', preds)
+        preds = detector.get_activity_detector_prediction()
+        if preds:
+            print('Event: ', preds)
         sys.stdout.write(' %.3f FPS' % (elapsed / (time.time() - start)))
         sys.stdout.flush()
     frame = detector.plot_objects(frame)

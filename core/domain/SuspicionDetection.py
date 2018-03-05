@@ -1,4 +1,6 @@
 """Sucpicion detection class which performs various detections from frame."""
+import copy
+
 import numpy as np
 
 from core.classifiers import EventDetector
@@ -251,6 +253,11 @@ class SuspicionDetection(object):
             img, self.get_yolo_prediction())
 
     def detect(self, frame):
+        # If we remove following line and use 'plot_objects' method to plot
+        # objects then classifiers will give wrong output. A prime example
+        # of how tricky an error can be.
+        frame = copy.deepcopy(frame)
+
         if self.is_yolo_on:
             if self.count % self.yolo_sample_rate == 0:
                 self.perform_yolo_inference(frame)
