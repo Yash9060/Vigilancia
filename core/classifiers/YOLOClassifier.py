@@ -16,6 +16,7 @@ class YOLO(BaseClassifier.BaseClassifier):
             'config': os.path.join(
                 vgconf.EXTRAS_PATH, vgconf.DARKFLOW_MODULE_NAME, 'cfg')
         }
+        self.labels = []
         super(YOLO, self).__init__()
     
     @property
@@ -37,6 +38,19 @@ class YOLO(BaseClassifier.BaseClassifier):
             'offset': self.offset
         })
         self.model = yolo.build_yolo_network(self.yolo_options)
-    
+        self.n_classes = yolo_conf['classes']
+        self.labels_file =self._get_data_path(yolo_conf['labels'])
+
+    def _process_labels_file(self):
+        self.labels = []
+        labels_file = open(self.labels_file, 'r')
+        for label in labels_file.readlines():
+            self.labels.append(label.strip())
+
+    def get_labels(self):
+        if not self.labels:
+            self._process_labels_file()
+        return self.labels
+
     def predict(self, frame):
         return self.model.return_predict(frame)
