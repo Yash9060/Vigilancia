@@ -1,10 +1,13 @@
 """Sucpicion detection class which performs various detections from frame."""
+import copy
+
 import numpy as np
 
 from core.classifiers import EventDetector
 from core.classifiers import Inception
 from core.classifiers import UnusualActivityDetector
 from core.classifiers import YOLOClassifier
+from core.domain import BoxPlotter
 from core.platform.async import async
 import vgconf
 
@@ -45,6 +48,9 @@ class SuspicionDetection(object):
 
         self.count = 0
         self.sample_rate_lcm = self._get_sample_rate_lcm()
+
+        self.box_plotter = None
+        self.is_closed = False
 
     def _get_gcd(self, a, b):
         while b > 0:
@@ -99,16 +105,22 @@ class SuspicionDetection(object):
         pass
 
     def enable_unusual_activity_detection(self):
+        if self.is_activity_detector_on:
+            return
         if not self.is_inception_on:
             self._get_inception()
         self._get_unusual_activity_detector()
 
     def enable_event_detection(self):
+        if self.is_event_detector_on:
+            return
         if not self.is_inception_on:
             self._get_inception()
         self._get_event_detector()
 
     def enable_yolo_detection(self):
+        if self.is_yolo_on:
+            return
         self._get_yolo_classifier()
 
     def set_yolo_sample_rate(self, rate):
@@ -121,6 +133,8 @@ class SuspicionDetection(object):
 
     @async.synchronize(lock='_inception_buffer_lock')
     def _inception_callback(self, result):
+        if self.is_closed:
+            return
         self.inception_buffer.append(result)
         if len(self.inception_buffer) > self.activity_detector_length:
             self.inception_buffer.pop(0)
@@ -133,7 +147,7 @@ class SuspicionDetection(object):
 
     @async.async_call(callback=_inception_callback)
     def _inception_inference(self):
-        if not self.inception_inference_buffer:
+        if not self.inception_inference_buffer or self.is_closed:
             return
         return self.inception.predict(self.inception_inference_buffer.pop(0))
 
@@ -145,13 +159,13 @@ class SuspicionDetection(object):
 
     @async.synchronize(lock='_inception_buffer_lock')
     def get_inception_prediction(self):
-        if not self.inception_buffer:
+        if not self.inception_buffer or self.is_closed:
             return []
         return self.inception_buffer[-1]
 
     @async.synchronize(lock='_yolo_buffer_lock')
     def _yolo_callback(self, result):
-        if not result:
+        if not result or self.is_closed:
             return
         self.yolo_buffer.append(result)
         if len(self.yolo_buffer) > 1:
@@ -159,7 +173,7 @@ class SuspicionDetection(object):
 
     @async.async_call(callback=_yolo_callback)
     def _yolo_inference(self):
-        if not self.yolo_inference_buffer:
+        if not self.yolo_inference_buffer or self.is_closed:
             return
         return self.yolo.predict(self.yolo_inference_buffer.pop(0))
 
@@ -171,19 +185,21 @@ class SuspicionDetection(object):
 
     @async.synchronize(lock='_yolo_buffer_lock')
     def get_yolo_prediction(self):
-        if not self.yolo_buffer:
+        if not self.yolo_buffer or self.is_closed:
             return []
         return self.yolo_buffer[-1]
 
     @async.synchronize(lock='_activity_detector_buffer_lock')
     def _activity_detector_callback(self, result):
+        if self.is_closed:
+            return
         self.activity_detector_buffer.append(result)
         if len(self.activity_detector_buffer) > 1:
             self.activity_detector_buffer.pop(0)
 
     @async.async_call(callback=_activity_detector_callback)
     def _activity_detector_inference(self):
-        if not self.activity_detector_inference_buffer:
+        if not self.activity_detector_inference_buffer or self.is_closed:
             return
         return self.activity_detector.predict(
             self.activity_detector_inference_buffer.pop(0))
@@ -196,19 +212,21 @@ class SuspicionDetection(object):
 
     @async.synchronize(lock='_activity_detector_buffer_lock')
     def get_activity_detector_prediction(self):
-        if not self.activity_detector_buffer:
+        if not self.activity_detector_buffer or self.is_closed:
             return None
         return self.activity_detector_buffer[-1]
 
     @async.synchronize(lock='_event_detector_buffer_lock')
     def _event_detector_callback(self, result):
+        if self.is_closed:
+            return
         self.event_detector_buffer.append(result)
         if len(self.event_detector_buffer) > 1:
             self.event_detector_buffer.pop(0)
 
     @async.async_call(callback=_event_detector_callback)
     def _event_detector_inference(self):
-        if not self.event_detector_inference_buffer:
+        if not self.event_detector_inference_buffer or self.is_closed:
             return
         return self.event_detector.predict(
             self.event_detector_inference_buffer.pop(0))
@@ -225,7 +243,21 @@ class SuspicionDetection(object):
             return []
         return self.event_detector_buffer[-1]
 
+    def plot_objects(self, img):
+        if not self.box_plotter:
+            if self.is_yolo_on:
+                self.box_plotter = BoxPlotter.BoxPlotter(self.yolo.get_labels())
+            else:
+                return
+        return self.box_plotter.plot_yolo_bboxes(
+            img, self.get_yolo_prediction())
+
     def detect(self, frame):
+        # If we remove following line and use 'plot_objects' method to plot
+        # objects then classifiers will give wrong output. A prime example
+        # of how tricky an error can be.
+        frame = copy.deepcopy(frame)
+
         if self.is_yolo_on:
             if self.count % self.yolo_sample_rate == 0:
                 self.perform_yolo_inference(frame)
@@ -239,4 +271,5 @@ class SuspicionDetection(object):
             self.count = 0
 
     def close(self):
+        self.is_closed = True
         self.async.close()

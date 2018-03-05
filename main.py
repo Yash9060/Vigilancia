@@ -15,6 +15,7 @@ from core.platform.opencv import VideoStream
 
 # Detector. Turn ON classifiers.
 detector = SuspicionDetection.SuspicionDetection()
+detector.enable_yolo_detection()
 detector.enable_unusual_activity_detection()
 stream = VideoStream.VideoStream(filename='../Crowd-Activity-All.avi')
 preds = []
@@ -31,13 +32,7 @@ while stream.is_next_frame_available():
             print('Event: ', preds)
         sys.stdout.write(' %.3f FPS' % (elapsed / (time.time() - start)))
         sys.stdout.flush()
-
-    #for pred in preds:
-    #    cv2.rectangle(
-    #        frame, (pred['topleft']['x'], pred['topleft']['y']),
-    #        (pred['bottomright']['x'], pred['bottomright']['y']),
-    #        (0, 255, 0), 1)
-
+    frame = detector.plot_objects(frame)
     elapsed += 1
     cv2.imshow('video', frame)
     if cv2.waitKey(1000 // 30) & 0xFF == ord('q'):

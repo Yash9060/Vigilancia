@@ -1,1 +1,1 @@
-{"weights": "yolo-coco.weights", "config": "yolo-coco.cfg", "offset": 16}
+{"weights": "yolo-coco.weights", "config": "yolo-coco.cfg", "offset": 16, "classes": 80, "labels": "coco.names"}
