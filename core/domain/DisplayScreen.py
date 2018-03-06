@@ -82,7 +82,7 @@ class DisplayScreen(object):
             'background-color: rgba(0, 0, 0, 0);' % self.label_color)
 
         self.fps_bar_label_geometry = (325, 65, 118, 20)
-        self.fps_bar_label_text = 'FPS'
+        self.fps_bar_label_text = 'FPS Meter'
         self.detection_label_point_size = 11
         self.object_detection_label_text = 'Object Detection' 
         self.object_detection_label_geometry = (510, 170, 171, 20)
