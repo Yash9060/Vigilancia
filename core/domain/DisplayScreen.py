@@ -1,5 +1,6 @@
 """Class that generates and handles events on Vigilancia UI."""
 import time
+import collections
 
 from core.domain import SuspicionDetection
 from core.platform.opencv import VideoStream
@@ -80,6 +81,8 @@ class DisplayScreen(object):
         self.label_stylesheet = ('color: %s;\n'
             'background-color: rgba(0, 0, 0, 0);' % self.label_color)
 
+        self.fps_bar_label_geometry = (325, 65, 118, 20)
+        self.fps_bar_label_text = 'FPS'
         self.detection_label_point_size = 11
         self.object_detection_label_text = 'Object Detection' 
         self.object_detection_label_geometry = (510, 170, 171, 20)
@@ -88,7 +91,7 @@ class DisplayScreen(object):
         self.abnormal_activity_label_text = 'Abnormal Activity'
         self.abnormal_activity_label_geometry = (510, 390, 171, 20)
         self.date_time_label_text = 'Today\'s date and time'
-        self.date_time_label_geometry = (20, 80, 271, 18)
+        self.date_time_label_geometry = (20, 80, 271, 20)
         self.datetime_format = '%a %b %d %H:%M:%S %Z %Y'
 
         self.file_name_label_stylesheet = ('color: %s;\n'
@@ -120,15 +123,21 @@ class DisplayScreen(object):
         self.vigilancia_title_label_geometry = (8, 9, 1031, 51)
 
         # Whether stream / video is playing or not.
+        self.streamer = VideoStream.VideoStream()
         self.is_stream_on = False
-        self.video_frame_size = (
-            self.video_window_geometry[2], self.video_window_geometry[2])
         self.FPS_rate = 25
+
+        # Timers
+        self.stream_timer = self.qt.get_timer()
+        self.datetime_timer = self.qt.get_timer()
+        self.fps_bar_timer = self.qt.get_timer()
+        self.classifier_timer = self.qt.get_timer()
 
         # Set timer timeout time.
         self.video_timer_update_rate = (1000 / 25)
         self.fps_bar_timer_update_rate = 1000
         self.datetime_timer_update_rate = 1000
+        self.classifier_timer_update_rate = 1000
 
         # FPS calculation parameters.
         self.elapsed = 0
@@ -136,6 +145,11 @@ class DisplayScreen(object):
 
         # Name of the selected file to stream. Default None.
         self.selected_stream_name = None
+
+        # Predictions.
+        self.objects_detector_prediction = []
+        self.event_detector_prediction = []
+        self.activity_detector_prediction = None
 
     def add_graphics_view(
             self, parent, name, geometry, stylesheet, interactive):
@@ -260,6 +274,7 @@ class DisplayScreen(object):
         self.video_window = self.add_label(
             self.central_widget, 'VideoWindow', self.video_window_geometry,
             self.video_window_stylesheet)
+        self.qt.set_label_scaled_content(self.video_window, True)
         self.alert_window = self.add_graphics_view(
             self.central_widget, 'AlertWindow', self.alert_window_geometry,
             self.alert_window_stylesheet, False)
@@ -321,6 +336,9 @@ class DisplayScreen(object):
             self.central_widget, 'PredictionLabel',
             self.date_time_label_geometry, self.label_stylesheet,
             self.detection_label_font)
+        self.fps_bar_label = self.add_label(
+            self.central_widget, 'FPSBarLabel', self.fps_bar_label_geometry,
+            self.label_stylesheet, self.detection_label_font)
 
         self.heading_label_font = self.get_font(
             self.default_font_family, self.heading_label_point_size,
@@ -377,6 +395,7 @@ class DisplayScreen(object):
         self.object_detection_label.raise_()
         self.event_detection_label.raise_()
         self.abnormal_activity_label.raise_()
+        self.fps_bar_label.raise_()
         self.file_name_label.raise_()
         self.date_time_label.raise_()
         self.objects_detected_view.raise_()
@@ -408,6 +427,9 @@ class DisplayScreen(object):
         self.qt.set_obj_text(
             self.abnormal_activity_label, 'MainWindow',
             self.abnormal_activity_label_text, None)
+        self.qt.set_obj_text(
+            self.fps_bar_label, 'MainWindow',
+            self.fps_bar_label_text, None)
         self.qt.set_obj_text(
             self.classifier_label, 'MainWindow',
             self.classifier_label_text, None)
@@ -455,6 +477,30 @@ class DisplayScreen(object):
         else:
             self.detector.disable_unusual_activity_detection()
 
+    def _update_detected_objects(self, objects_prediction):
+        parsed_objects = [p['label'] for p in objects_prediction]
+        parsed_objects_dict = collections.Counter(parsed_objects)
+        objects = ''
+        for (obj, count) in parsed_objects_dict.items():
+            objects += '%s (%d)\n' % (obj, count)
+        self.objects_detected_view_text = objects
+        self.qt.set_obj_plain_text(
+            self.objects_detected_view, 'MainWindow',
+            self.objects_detected_view_text, None)
+
+    def _update_detceted_events(self, events_prediction):
+        events = ', '.join(events_prediction)
+        self.events_detected_view_text = events
+        self.qt.set_obj_plain_text(
+            self.events_detected_view, 'MainWindow',
+            self.events_detected_view_text, None)
+
+    def _update_detected_activity(self, activity_prediction):
+        self.activity_detected_view_text = activity_prediction
+        self.qt.set_obj_plain_text(
+            self.activity_detected_view, 'MainWindow',
+            self.activity_detected_view_text, None)
+
     def _update_stream_name_label(self):
         filename = 'webcam'
         if self.selected_stream_name:
@@ -473,19 +519,39 @@ class DisplayScreen(object):
     def _update_video_window(self):
         if self.streamer.is_next_frame_available():
             frame = self.streamer.read_next_frame()
-            frame = self.streamer.qt_preprocess(frame, self.video_frame_size)
+            self.detector.detect(frame)
+            frame = self.detector.plot_objects(frame)
+            frame = self.streamer.qt_preprocess(frame)
             self.qt.set_label_img(self.video_window, frame)
             # Calculate FPS rate.
             self._update_fps_rate()
             self.elapsed += 1
 
+    def _update_predictions(self):
+        self.objects_detector_prediction = self.detector.get_yolo_prediction()
+        self.activity_detector_prediction = (
+            self.detector.get_activity_detector_prediction())
+        self.event_detector_prediction = (
+            self.detector.get_event_detector_prediction())
+
+        if self.objects_detector_prediction:
+            self._update_detected_objects(self.objects_detector_prediction)
+        if self.activity_detector_prediction:
+            self._update_detected_activity(self.activity_detector_prediction)
+        if self.event_detector_prediction:
+            self._update_detceted_events(self.event_detector_prediction)
+
     def _start_streaming(self):
+        if not self.streamer.is_closed:
+            self.streamer.close()
         self.streamer = VideoStream.VideoStream(self.selected_stream_name)
         # Get timers.
         self.stream_timer = self.get_timer(
             self._update_video_window, self.video_timer_update_rate)
         self.fps_bar_timer = self.get_timer(
             self._update_fps_bar, self.fps_bar_timer_update_rate)
+        self.classifier_timer = self.get_timer(
+            self._update_predictions, self.classifier_timer_update_rate)
         # Parameters for updating FPS rate.
         self.stream_start_time = time.time()
         self.elapsed = 0
@@ -494,6 +560,7 @@ class DisplayScreen(object):
         # Stop timers.
         self.stream_timer.stop()
         self.fps_bar_timer.stop()
+        self.classifier_timer.stop()
         # Close stream.
         self.streamer.close()
         self.video_window.clear()
@@ -557,6 +624,15 @@ class DisplayScreen(object):
         self.qt.connect_slots_by_name(self.main_window)
         self.main_window.show()
 
+    def _close(self):
+        self.stream_timer.stop()
+        self.fps_bar_timer.stop()
+        self.datetime_timer.stop()
+        self.classifier_timer.stop()
+        self.streamer.close()
+        self.detector.close()
+
     def start_app(self):
         self._start_datetime_timer()
+        self.qt.connect_obj_event(self.app, 'aboutToQuit()', self._close)
         return self.app.exec_()
