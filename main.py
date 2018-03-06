@@ -6,6 +6,6 @@ from core.domain import DisplayScreen
 import sys
 
 if __name__ == '__main__':
-    dsp = DisplayScreen.DisplayScreen(args)
+    dsp = DisplayScreen.DisplayScreen(sys.argv)
     dsp.create_application()
     sys.exit(dsp.start_app())
