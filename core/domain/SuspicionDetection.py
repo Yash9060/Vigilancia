@@ -151,7 +151,7 @@ class SuspicionDetection(object):
 
     @async.synchronize(lock='_inception_buffer_lock')
     def _inception_callback(self, result):
-        if not result or self.is_closed:
+        if result is None or self.is_closed:
             return
         self.inception_buffer.append(result)
         if len(self.inception_buffer) > self.activity_detector_length:
@@ -183,7 +183,7 @@ class SuspicionDetection(object):
 
     @async.synchronize(lock='_yolo_buffer_lock')
     def _yolo_callback(self, result):
-        if not result or self.is_closed:
+        if result is None or self.is_closed:
             return
         self.yolo_buffer.append(result)
         if len(self.yolo_buffer) > 1:
@@ -209,7 +209,7 @@ class SuspicionDetection(object):
 
     @async.synchronize(lock='_activity_detector_buffer_lock')
     def _activity_detector_callback(self, result):
-        if not result or self.is_closed:
+        if result is None or self.is_closed:
             return
         self.activity_detector_buffer.append(result)
         if len(self.activity_detector_buffer) > 1:
@@ -236,7 +236,7 @@ class SuspicionDetection(object):
 
     @async.synchronize(lock='_event_detector_buffer_lock')
     def _event_detector_callback(self, result):
-        if not result or self.is_closed:
+        if result is None or self.is_closed:
             return
         self.event_detector_buffer.append(result)
         if len(self.event_detector_buffer) > 1:
