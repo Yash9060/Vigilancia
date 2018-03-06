@@ -262,13 +262,13 @@ class SuspicionDetection(object):
         return self.event_detector_buffer[-1]
 
     def plot_objects(self, img):
-        if not self.box_plotter:
-            if self.is_yolo_on:
+        if self.is_yolo_on:
+            if not self.box_plotter:
                 self.box_plotter = BoxPlotter.BoxPlotter(self.yolo.get_labels())
-            else:
-                return
-        return self.box_plotter.plot_yolo_bboxes(
-            img, self.get_yolo_prediction())
+            return self.box_plotter.plot_yolo_bboxes(
+                img, self.get_yolo_prediction())
+        else:
+            return img
 
     def detect(self, frame):
         # If we remove following line and use 'plot_objects' method to plot
@@ -289,5 +289,6 @@ class SuspicionDetection(object):
             self.count = 0
 
     def close(self):
-        self.is_closed = True
-        self.async.close()
+        if not self.is_closed:
+            self.is_closed = True
+            self.async.close()
