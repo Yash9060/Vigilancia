@@ -2,7 +2,7 @@
 
 Vigilancia is a video sureveillance system designed to assist security staff for identifying anomalous activities, events and items. This project is currently under development. It is a final year university project of a team consisting of four students.
 
-## Desclaimer
+## Disclaimer
 Install it at your own risk. We are not responsible for any damage happens to your machine due to Vigilancia. We have tested this software on our laptop and it is working without any issues.
 
 ## Dependencies
