@@ -91,14 +91,17 @@ class SuspicionDetection(object):
         x = self.yolo.predict(random_input)
         self.is_yolo_on = True
 
-    def _remove_event_detector(self):
-        # How to do this ???
-        pass
-
     def _remove_inception(self):
         pass
 
+    def _remove_event_detector(self):
+        if not self.is_activity_detector_on:
+            self._remove_inception()
+        pass
+
     def _remove_unusual_activity_detector(self):
+        if not self.is_event_detector_on:
+            self._remove_inception()
         pass
 
     def _remove_yolo_classifier(self):
@@ -122,6 +125,21 @@ class SuspicionDetection(object):
         if self.is_yolo_on:
             return
         self._get_yolo_classifier()
+
+    def disable_unusual_activity_detection(self):
+        if not self.is_activity_detector_on:
+            return
+        self._remove_unusual_activity_detector()
+
+    def disable_event_detection(self):
+        if not self.is_event_detector_on:
+            return
+        self._remove_event_detector()
+
+    def disable_yolo_detection(self):
+        if not self.is_yolo_on:
+            return
+        self._remove_yolo_classifier()
 
     def set_yolo_sample_rate(self, rate):
         self.yolo_sample_rate = rate

@@ -24,6 +24,11 @@ class VideoStream(object):
     
     def is_next_frame_available(self):
         return self.ret
+
+    def qt_preprocess(self, frame, frame_size):
+        frame = cv2.resize(frame, frame_size)
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        return frame
     
     def close(self):
         self.ret = False
