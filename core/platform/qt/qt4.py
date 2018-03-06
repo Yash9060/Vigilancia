@@ -166,6 +166,25 @@ class Qt(object):
     def get_application(self, args):
         return QtGui.QApplication(args)
 
+    def get_timer(self):
+        return QtCore.QTimer()
+
+    def convert_img_to_pixmap(self, img):
+        img = QtGui.QImage(
+                img, img.shape[1], img.shape[0],
+                QtGui.QImage.Format_RGB888)
+        pix = QtGui.QPixmap.fromImage(img)
+        return pix
+
+    def set_label_img(self, label, img):
+        pix = self.convert_img_to_pixmap(img)
+        return label.setPixmap(pix)
+
+    def get_file_dialog(self, parent_widget, filters):
+        file = QtGui.QFileDialog(parent_widget)
+        file.setFilter(filters)
+        return file
+
     def connect_obj_event(self, obj, signal_name, listener):
         """Connects an event signal of given obj to a listener. A listener
         is a python callable.
