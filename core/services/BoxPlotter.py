@@ -4,12 +4,16 @@ import math
 import cv2
 
 class BoxPlotter(object):
-    def __init__(self, labels):
+    def __init__(self, labels=[]):
         self.labels = labels
         self.n_classes = len(labels)
         self.colors = []
         self.labels_to_colors = []
-        self.default_color = (0, 0, 255)
+        self.default_color = (255, 0, 0)
+
+    def add_labels(self, labels):
+        self.labels.extend(labels)
+        self.n_classes = len(self.labels)
 
     def _generate_colors(self):
         base = int(math.ceil(pow(self.n_classes, 1.0/3)))
@@ -33,8 +37,8 @@ class BoxPlotter(object):
             return self.default_color
         return self.labels_to_colors[label]
 
-    def plot_yolo_bboxes(self, img, yolo_out):
-        for pred in yolo_out:
+    def plot_bboxes(self, img, out):
+        for pred in out:
             cv2.rectangle(
                 img, (pred['topleft']['x'], pred['topleft']['y']),
                 (pred['bottomright']['x'], pred['bottomright']['y']),

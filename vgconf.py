@@ -12,13 +12,18 @@ DARKFLOW_MODULE_NAME = 'darkflow'
 
 # Default values.
 DEFAULT_YOLO_SAMPLE_RATE = 5
+DEFAULT_FIREARM_SAMPLE_RATE = 10
 DEFAULT_INCEPTION_SAMPLE_RATE = 15
 ACTIVITY_DETECTOR_LENGTH = 4
 
 # Set default YOLO classifier. It can be either 'tiny-yolo-coco' or 'yolo-coco'.
 DEFAULT_YOLO_CLASSIFIER = 'tiny-yolo-coco'
+# Set default YOLO classifier. It can be either 'FirearmDetectorTiny' or
+# 'FirearmDetector'.
+DEFAULT_FIREARM_DETECTOR = 'FirearmDetector'
 
 # Classifier constants.
 ACTIVITY_DETECTION_THRESHOLD = 0.7
-EVENT_DETECTION_TOP_COUNT = 5
+EVENT_DEVENT_DETECTION_TOP_COUNTETECTION_TOP_COUNT = 1
 YOLO_THRESHOLD = 0.25
+FIREARM_DETECTION_THRESHOLD = 0.45

@@ -2,7 +2,7 @@
 import time
 import collections
 
-from core.domain import SuspicionDetection
+from core.services import SuspicionDetection
 from core.platform.opencv import VideoStream
 from core.platform.qt import qt4
 
@@ -53,6 +53,7 @@ class DisplayScreen(object):
         self.slider_page_step = 1
         self.slider_orientation = self.qt.horizontal_orientation
         self.object_detection_slider_geometry = (700, 170, 31, 20)
+        self.firearm_detection_slider_geometry = (700, 210, 31, 20)
         self.event_detection_slider_geometry = (700, 280, 31, 20)
         self.abnormal_activity_slider_geometry = (700, 390, 31, 20)
 
@@ -72,7 +73,7 @@ class DisplayScreen(object):
         self.clear_button_geometry = (250, 440, 80, 34)
         self.file_selection_button_text = 'Select file to stream'
         self.file_selection_button_geometry = (30, 440, 210, 34)
-        self.file_selection_filter = 'AVI (*.avi);;MP4 (*.mp4)'
+        self.file_selection_filter = 'AVI (*.avi);;MP4 (*.mp4);;MKV (*.mkv)'
         self.file_selection_dialog_stylesheet = ('color: lightgrey;')
 
         self.default_font_family = 'DejaVu Sans Mono'
@@ -86,6 +87,8 @@ class DisplayScreen(object):
         self.detection_label_point_size = 11
         self.object_detection_label_text = 'Object Detection' 
         self.object_detection_label_geometry = (510, 170, 171, 20)
+        self.firearm_detection_label_text = 'Firearm Detection' 
+        self.firearm_detection_label_geometry = (510, 210, 171, 20)
         self.event_detection_label_text = 'Event Detection'
         self.event_detection_label_geometry = (510, 280, 171, 20)
         self.abnormal_activity_label_text = 'Abnormal Activity'
@@ -291,6 +294,11 @@ class DisplayScreen(object):
             self.object_detection_slider_geometry, self.slider_stylesheet,
             self.slider_value, self.slider_page_step, self.slider_maximum,
             True, self.slider_orientation)
+        self.firearm_detection_slider = self.add_slider(
+            self.central_widget, 'FirearmDetectionSlider',
+            self.firearm_detection_slider_geometry, self.slider_stylesheet,
+            self.slider_value, self.slider_page_step, self.slider_maximum,
+            True, self.slider_orientation)
         self.event_detection_slider = self.add_slider(
             self.central_widget, 'ObjectDetectionSlider',
             self.event_detection_slider_geometry, self.slider_stylesheet,
@@ -323,6 +331,10 @@ class DisplayScreen(object):
         self.object_detection_label = self.add_label(
             self.central_widget, 'ObjectDetectionLabel',
             self.object_detection_label_geometry, self.label_stylesheet,
+            self.detection_label_font)
+        self.firearm_detection_label = self.add_label(
+            self.central_widget, 'FirearmDetectionLabel',
+            self.firearm_detection_label_geometry, self.label_stylesheet,
             self.detection_label_font)
         self.event_detection_label = self.add_label(
             self.central_widget, 'EventDetectionLabel',
@@ -393,6 +405,7 @@ class DisplayScreen(object):
         self.classifier_label.raise_()
         self.prediction_label.raise_()
         self.object_detection_label.raise_()
+        self.firearm_detection_label.raise_()
         self.event_detection_label.raise_()
         self.abnormal_activity_label.raise_()
         self.fps_bar_label.raise_()
@@ -421,6 +434,9 @@ class DisplayScreen(object):
         self.qt.set_obj_text(
             self.object_detection_label, 'MainWindow',
             self.object_detection_label_text, None)
+        self.qt.set_obj_text(
+            self.firearm_detection_label, 'MainWindow',
+            self.firearm_detection_label_text, None)
         self.qt.set_obj_text(
             self.event_detection_label, 'MainWindow',
             self.event_detection_label_text, None)
@@ -462,6 +478,13 @@ class DisplayScreen(object):
             self.detector.enable_yolo_detection()
         else:
             self.detector.disable_yolo_detection()
+
+    def _firearm_detection_slider_value_changed(self):
+        value = self.firearm_detection_slider.value()
+        if value == 1:
+            self.detector.enable_firearm_detection()
+        else:
+            self.detector.disable_firearm_detection()
 
     def _event_detection_slider_value_changed(self):
         value = self.event_detection_slider.value()
@@ -529,13 +552,21 @@ class DisplayScreen(object):
 
     def _update_predictions(self):
         self.objects_detector_prediction = self.detector.get_yolo_prediction()
+        self.firearm_detector_prediction = (
+            self.detector.get_firearm_detector_prediction())
         self.activity_detector_prediction = (
             self.detector.get_activity_detector_prediction())
         self.event_detector_prediction = (
             self.detector.get_event_detector_prediction())
 
+        self.detected_objects = []
         if self.objects_detector_prediction:
-            self._update_detected_objects(self.objects_detector_prediction)
+            self.detected_objects.extend(self.objects_detector_prediction)
+        if self.firearm_detector_prediction:
+            self.detected_objects.extend(self.firearm_detector_prediction)
+
+        if self.detected_objects:
+            self._update_detected_objects(self.detected_objects)
         if self.activity_detector_prediction:
             self._update_detected_activity(self.activity_detector_prediction)
         if self.event_detector_prediction:
@@ -602,6 +633,9 @@ class DisplayScreen(object):
         self.qt.connect_obj_event(
             self.object_detection_slider, 'valueChanged(int)', 
             self._object_detection_slider_value_changed)
+        self.qt.connect_obj_event(
+            self.firearm_detection_slider, 'valueChanged(int)', 
+            self._firearm_detection_slider_value_changed)
         self.qt.connect_obj_event(
             self.event_detection_slider, 'valueChanged(int)', 
             self._event_detection_slider_value_changed)

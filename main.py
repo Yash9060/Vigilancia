@@ -2,7 +2,7 @@
 import vg_config
 vg_config.init()
 
-from core.domain import DisplayScreen
+from core.services import DisplayScreen
 import sys
 
 if __name__ == '__main__':
