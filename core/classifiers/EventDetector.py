@@ -15,9 +15,9 @@ class EventDetector(BaseClassifier.BaseClassifier):
 
     def _generate_model(self):
         inp = layers.Input(shape=(2048,))
-        x = layers.Dense(800, activation='sigmoid', name='fc1')(inp)
+        x = layers.Dense(250, activation='sigmoid', name='fc1')(inp)
         x = layers.Dropout(0.5, name='fc1drop')(x)
-        preds = layers.Dense(units=61, activation='softmax')(x)
+        preds = layers.Dense(units=5, activation='softmax')(x)
         self.model = models.Model(inputs=inp, outputs=preds)
         self.model.compile(
             optimizer='nadam', loss='categorical_crossentropy',
