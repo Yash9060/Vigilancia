@@ -1,4 +1,4 @@
-"""Class for YOLO classifier."""
+"""Class for Firearm Detector."""
 import json
 import os
 
