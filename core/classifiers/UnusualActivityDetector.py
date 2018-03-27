@@ -22,9 +22,9 @@ class UnusualActivityDetector(BaseClassifier.BaseClassifier):
     def get_class_name(self, predictions):
         prediction = predictions[0]
         if prediction > vgconf.ACTIVITY_DETECTION_THRESHOLD:
-            return 'Abnormal Activity'
+            return vgconf.ABNORMAL_ACTIVITY
         else:
-            return 'Normal Activity'
+            return vgconf.NORMAL_ACTIVITY
 
     def _restore_model_params(self):
         self.model.load_weights(self._get_data_path(self.weights_file))
