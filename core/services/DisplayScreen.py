@@ -551,11 +551,22 @@ class DisplayScreen(object):
             self.events_detected_view, 'MainWindow',
             self.events_detected_view_text, None)
 
+        detected_suspicious_events = False
+        for event in events_prediction:
+            if event in vgconf.SUSPICIOUS_EVENTS_LIST:
+                detected_suspicious_events = True
+
+        if detected_suspicious_events:
+            self._start_visual_alert()
+
     def _update_detected_activity(self, activity_prediction):
         self.activity_detected_view_text = activity_prediction
         self.qt.set_obj_plain_text(
             self.activity_detected_view, 'MainWindow',
             self.activity_detected_view_text, None)
+
+        if activity_prediction == vgconf.ABNORMAL_ACTIVITY:
+            self._start_visual_alert()
 
     def _update_stream_name_label(self):
         filename = 'webcam'

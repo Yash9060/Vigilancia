@@ -16,7 +16,8 @@ DEFAULT_FIREARM_SAMPLE_RATE = 5
 DEFAULT_INCEPTION_SAMPLE_RATE = 15
 ACTIVITY_DETECTOR_LENGTH = 4
 
-# Set default YOLO classifier. It can be either 'tiny-yolo-coco' or 'yolo-coco'.
+# Set default YOLO classifier. It can be either 'tiny-yolo-coco' or
+# 'yolo-coco'.
 DEFAULT_YOLO_CLASSIFIER = 'tiny-yolo-coco'
 # Set default Firearm classifier. It can be either 'FirearmDetectorTiny' or
 # 'FirearmDetector'.
@@ -31,6 +32,18 @@ EVENT_DETECTION_TOP_COUNT = 3
 YOLO_THRESHOLD = 0.25
 FIREARM_DETECTION_THRESHOLD = 0.30
 
+# Normal and Abnormal Activity prediction strings.
+ABNORMAL_ACTIVITY = 'Abnormal Activity'
+NORMAL_ACTIVITY = 'Normal Activity'
+
+# Flash the screen for given number of times when suspicious objects or events
+# are detected.
+DEFAULT_ALERT_FLASH_COUNT = 8
+
 # Suspicious objects.
 SUSPICIOUS_OBJECTS_LIST = ['pistol', 'knife']
-DEFAULT_ALERT_FLASH_COUNT = 8
+SUSPICIOUS_EVENTS_LIST = [
+	'Parade' ,'People_Marching' ,'Riot' ,'Raid',' Traffic' ,'Car_Racin' ,
+	'Car_Accident' ,'Soldier_Firing' ,'Soldier_Patrol' ,'Soldier_Drilling' ,
+	'Street_Battle']
+SUSPICIOUS_ACTIVITY = ABNORMAL_ACTIVITY
