@@ -18,15 +18,18 @@ ACTIVITY_DETECTOR_LENGTH = 4
 
 # Set default YOLO classifier. It can be either 'tiny-yolo-coco' or 'yolo-coco'.
 DEFAULT_YOLO_CLASSIFIER = 'tiny-yolo-coco'
-# Set default YOLO classifier. It can be either 'FirearmDetectorTiny' or
+# Set default Firearm classifier. It can be either 'FirearmDetectorTiny' or
 # 'FirearmDetector'.
 DEFAULT_FIREARM_DETECTOR = 'FirearmDetector'
+# Set default Event classifier. It can be either 'EventDetectorTiny' or
+# 'EventDetector'.
+DEFAULT_EVENT_DETECTOR = 'EventDetector'
 
 # Classifier constants.
 ACTIVITY_DETECTION_THRESHOLD = 0.7
-EVENT_DETECTION_TOP_COUNT = 1
+EVENT_DETECTION_TOP_COUNT = 3
 YOLO_THRESHOLD = 0.25
-FIREARM_DETECTION_THRESHOLD = 0.25
+FIREARM_DETECTION_THRESHOLD = 0.30
 
 # Suspicious objects.
 SUSPICIOUS_OBJECTS_LIST = ['pistol', 'knife']
