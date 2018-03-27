@@ -5,6 +5,7 @@ import collections
 from core.services import SuspicionDetection
 from core.platform.opencv import VideoStream
 from core.platform.qt import qt4
+import vgconf
 
 class DisplayScreen(object): 
     def __init__(self, args):
@@ -22,8 +23,10 @@ class DisplayScreen(object):
         self.video_window_stylesheet = ('color: white;\n'
             'background-color: lightgray;\n')
         self.video_window_geometry = (30, 110, 400, 310)
-        self.alert_window_stylesheet = (
+        self.alert_window_stylesheet_red = (
             'background-color: rgba(186, 46, 46, 220)')
+        self.alert_window_stylesheet_white = (
+            'background-color: white')
         self.alert_window_geometry = (20, 100, 420, 330)
 
         self.fps_bar_geometry = (320, 80, 118, 23)
@@ -135,12 +138,17 @@ class DisplayScreen(object):
         self.datetime_timer = self.qt.get_timer()
         self.fps_bar_timer = self.qt.get_timer()
         self.classifier_timer = self.qt.get_timer()
+        self.alert_timer = self.qt.get_timer()
 
         # Set timer timeout time.
         self.video_timer_update_rate = (1000 / self.FPS_rate)
         self.fps_bar_timer_update_rate = 1000
         self.datetime_timer_update_rate = 1000
         self.classifier_timer_update_rate = 1000
+        self._flash_alert_update_rate = 250
+
+        # How many time alert should be flashed.
+        self.alert_count = 0
 
         # FPS calculation parameters.
         self.elapsed = 0
@@ -280,7 +288,7 @@ class DisplayScreen(object):
         self.qt.set_label_scaled_content(self.video_window, True)
         self.alert_window = self.add_graphics_view(
             self.central_widget, 'AlertWindow', self.alert_window_geometry,
-            self.alert_window_stylesheet, False)
+            self.alert_window_stylesheet_white, False)
 
         # Add FPS progress bar.
         self.fps_bar = self.add_progress_bar(
@@ -472,6 +480,22 @@ class DisplayScreen(object):
             self.activity_detected_view, 'MainWindow',
             self.activity_detected_view_text, None)
 
+    def _flash_alert(self):
+        self.alert_count -= 1
+        if self.alert_count == 0:
+            self.alert_timer.stop()
+        alert_stylsheet = self.alert_window_stylesheet_white
+        if self.alert_count % 2:
+            alert_stylsheet = self.alert_window_stylesheet_red
+        self.qt.set_obj_stylesheet(self.alert_window, alert_stylsheet)
+        self.alert_window.update()
+
+    def _start_visual_alert(self):
+        if self.alert_count == 0:
+            self.alert_timer = self.get_timer(
+                self._flash_alert, self._flash_alert_update_rate)
+        self.alert_count = vgconf.DEFAULT_ALERT_FLASH_COUNT
+
     def _object_detection_slider_value_changed(self):
         value = self.object_detection_slider.value()
         if value == 1:
@@ -503,13 +527,22 @@ class DisplayScreen(object):
     def _update_detected_objects(self, objects_prediction):
         parsed_objects = [p['label'] for p in objects_prediction]
         parsed_objects_dict = collections.Counter(parsed_objects)
+        detected_suspicious_objects = False
         objects = ''
+
         for (obj, count) in parsed_objects_dict.items():
             objects += '%s (%d)\n' % (obj, count)
+            if obj in vgconf.SUSPICIOUS_OBJECTS_LIST:
+                detected_suspicious_objects = True
+
         self.objects_detected_view_text = objects
         self.qt.set_obj_plain_text(
             self.objects_detected_view, 'MainWindow',
             self.objects_detected_view_text, None)
+
+        # Start alert if suspicious object is detected.
+        if detected_suspicious_objects:
+            self._start_visual_alert()
 
     def _update_detceted_events(self, events_prediction):
         events = ', '.join(events_prediction)
