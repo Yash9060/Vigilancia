@@ -137,7 +137,7 @@ class DisplayScreen(object):
         self.classifier_timer = self.qt.get_timer()
 
         # Set timer timeout time.
-        self.video_timer_update_rate = (1000 / 25)
+        self.video_timer_update_rate = (1000 / self.FPS_rate)
         self.fps_bar_timer_update_rate = 1000
         self.datetime_timer_update_rate = 1000
         self.classifier_timer_update_rate = 1000
@@ -565,8 +565,7 @@ class DisplayScreen(object):
         if self.firearm_detector_prediction:
             self.detected_objects.extend(self.firearm_detector_prediction)
 
-        if self.detected_objects:
-            self._update_detected_objects(self.detected_objects)
+        self._update_detected_objects(self.detected_objects)
         if self.activity_detector_prediction:
             self._update_detected_activity(self.activity_detector_prediction)
         if self.event_detector_prediction:
