@@ -8,6 +8,7 @@
 *.cfg
 *.h5
 *.pb
+*.meta
 
 # Ignore all extras.
 /extras/*

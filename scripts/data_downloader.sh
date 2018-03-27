@@ -64,3 +64,44 @@ if [ ! -d $UNUSUAL_ACTIVITY_DETECTOR_WGT ]; then
     wget "https://github.com/prasanna08/VigilanciaWeights/raw/master/UnusualActivityDetector/UnusualActivityDetector.h5" -O $UNUSUAL_ACTIVITY_DETECTOR_WGT/UnusualActivityDetector.h5
 fi;
 echo "Unusual Activity Detector weights are available locally"
+
+if [ "$PREFERRED_FIREARM_MODEL" = "FirearmDetectorTiny" ]; then
+    echo "Checking FirearmDetectorTiny files..."
+
+    FIREARM_META=$CURR_DIR/data/classifiers/FirearmDetector/FirearmDetectorTiny.meta
+    if [ ! -f $FIREARM_META ]; then
+        echo "Downloading FirearmDetectorTiny meta file..."
+        wget "https://github.com/prasanna08/VigilanciaWeights/raw/master/FirearmDetector/FirearmDetectorTiny.meta" -O $FIREARM_META
+    fi;
+
+    FIREARM_WGT=$CURR_DIR/data/classifiers/FirearmDetector/FirearmDetectorTiny.pb
+    if [ ! -f $FIREARM_WGT ]; then
+        echo "Downloading FirearmDetectorTiny weights file..."
+        wget "https://github.com/prasanna08/VigilanciaWeights/raw/master/FirearmDetector/FirearmDetectorTiny.pb" -O $FIREARM_WGT
+    fi;
+    
+    echo "FirearmDetectorTiny model is available locally"
+fi;
+
+if [ "$PREFERRED_FIREARM_MODEL" = "FirearmDetector" ]; then
+    echo "Checking FirearmDetector files..."
+
+    FIREARM_META=$CURR_DIR/data/classifiers/FirearmDetector/FirearmDetector.meta
+    if [ ! -f $FIREARM_META ]; then
+        echo "Downloading FirearmDetector meta file..."
+        wget "https://github.com/prasanna08/VigilanciaWeights/raw/master/FirearmDetector/FirearmDetector.meta" -O $FIREARM_META
+    fi;
+
+    FIREARM_WGT=$CURR_DIR/data/classifiers/FirearmDetector/FirearmDetector.pb
+    if [ ! -f $FIREARM_WGT ]; then
+        FIREARM_WGT_1=$CURR_DIR/data/classifiers/FirearmDetector/FirearmDetector1
+        FIREARM_WGT_2=$CURR_DIR/data/classifiers/FirearmDetector/FirearmDetector2
+        echo "Downloading FirearmDetector weights file..."
+        wget "https://github.com/prasanna08/VigilanciaWeights/raw/master/FirearmDetector/FirearmDetector1" -O $FIREARM_WGT_1
+        wget "https://github.com/prasanna08/VigilanciaWeights/raw/master/FirearmDetector/FirearmDetector2" -O $FIREARM_WGT_2
+        cat $FIREARM_WGT_1 $FIREARM_WGT_2 > $FIREARM_WGT
+        rm FIREARM_WGT_1 FIREARM_WGT_2
+    fi;
+    
+    echo "FirearmDetector model is available locally"
+fi;
