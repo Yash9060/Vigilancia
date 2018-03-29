@@ -47,3 +47,6 @@ SUSPICIOUS_EVENTS_LIST = [
 	'Car_Accident' ,'Soldier_Firing' ,'Soldier_Patrol' ,'Soldier_Drilling' ,
 	'Street_Battle']
 SUSPICIOUS_ACTIVITY = ABNORMAL_ACTIVITY
+
+# Audio alert file.
+ALERT_BEEP_FILE = os.path.join(VIGILANCIA_PATH, 'data', 'sounds', 'beep.wav')

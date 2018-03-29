@@ -1,5 +1,6 @@
 """Class for Unusual Activity Detector."""
 from keras import layers, models
+from keras import backend as K
 import numpy as np
 
 from core.classifiers import BaseClassifier
@@ -36,3 +37,6 @@ class UnusualActivityDetector(BaseClassifier.BaseClassifier):
     def predict(self, frame):
         predictions = self.model.predict(np.expand_dims(frame, 0))[0]
         return self.get_class_name(predictions)
+
+    def close(self):
+        pass

@@ -54,3 +54,6 @@ class YOLO(BaseClassifier.BaseClassifier):
 
     def predict(self, frame):
         return self.model.return_predict(frame)
+
+    def close(self):
+        self.model.sess.close()

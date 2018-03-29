@@ -51,3 +51,6 @@ class Inception(BaseClassifier.BaseClassifier):
             return self.pool_output(frame)
         else:
             return self.imagenet_prediction(frame)
+
+    def close(self):
+        self.session.close()
