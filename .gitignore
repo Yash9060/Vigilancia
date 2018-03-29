@@ -14,3 +14,8 @@
 /extras/*
 # Except keep folder.
 !/extras/.gitkeep
+
+# Igonore all mp3 wav and mp4 files
+*.mp4
+*.mp3
+*.wav

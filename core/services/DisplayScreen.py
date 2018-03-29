@@ -516,6 +516,7 @@ class DisplayScreen(object):
             self.detector.enable_event_detection()
         else:
             self.detector.disable_event_detection()
+            self._update_detected_events('Events')
 
     def _abnormal_activity_slider_value_changed(self):
         value = self.abnormal_activity_slider.value()
@@ -523,50 +524,69 @@ class DisplayScreen(object):
             self.detector.enable_unusual_activity_detection()
         else:
             self.detector.disable_unusual_activity_detection()
+            self._update_detected_activity('Activity')
 
     def _update_detected_objects(self, objects_prediction):
-        parsed_objects = [p['label'] for p in objects_prediction]
-        parsed_objects_dict = collections.Counter(parsed_objects)
-        detected_suspicious_objects = False
-        objects = ''
+        if self.detector.is_yolo_on or self.detector.is_firearm_detector_on:
+            parsed_objects = [p['label'] for p in objects_prediction]
+            parsed_objects_dict = collections.Counter(parsed_objects)
+            detected_suspicious_objects = False
+            objects = ''
 
-        for (obj, count) in parsed_objects_dict.items():
-            objects += '%s (%d)\n' % (obj, count)
-            if obj in vgconf.SUSPICIOUS_OBJECTS_LIST:
-                detected_suspicious_objects = True
+            for (obj, count) in parsed_objects_dict.items():
+                objects += '%s (%d)\n' % (obj, count)
+                if obj in vgconf.SUSPICIOUS_OBJECTS_LIST:
+                    detected_suspicious_objects = True
 
-        self.objects_detected_view_text = objects
-        self.qt.set_obj_plain_text(
-            self.objects_detected_view, 'MainWindow',
-            self.objects_detected_view_text, None)
+            self.objects_detected_view_text = objects
+            self.qt.set_obj_plain_text(
+                self.objects_detected_view, 'MainWindow',
+                self.objects_detected_view_text, None)
 
-        # Start alert if suspicious object is detected.
-        if detected_suspicious_objects:
-            self._start_visual_alert()
+            # Start alert if suspicious object is detected.
+            if detected_suspicious_objects:
+                self._start_visual_alert()
+        else:
+            self.objects_detected_view_text = 'Objects'
+            self.qt.set_obj_plain_text(
+                self.objects_detected_view, 'MainWindow',
+                self.objects_detected_view_text, None)
 
-    def _update_detceted_events(self, events_prediction):
-        events = ', '.join(events_prediction)
-        self.events_detected_view_text = events
-        self.qt.set_obj_plain_text(
-            self.events_detected_view, 'MainWindow',
-            self.events_detected_view_text, None)
+    def _update_detected_events(self, events_prediction):
+        if self.detector.is_event_detector_on:
+            events = ', '.join(events_prediction)
+            self.events_detected_view_text = events
+            self.qt.set_obj_plain_text(
+                self.events_detected_view, 'MainWindow',
+                self.events_detected_view_text, None)
 
-        detected_suspicious_events = False
-        for event in events_prediction:
-            if event in vgconf.SUSPICIOUS_EVENTS_LIST:
-                detected_suspicious_events = True
+            detected_suspicious_events = False
+            for event in events_prediction:
+                if event in vgconf.SUSPICIOUS_EVENTS_LIST:
+                    detected_suspicious_events = True
 
-        if detected_suspicious_events:
-            self._start_visual_alert()
+            if detected_suspicious_events:
+                self._start_visual_alert()
+        else:
+            self.events_detected_view_text = events_prediction
+            self.qt.set_obj_plain_text(
+                self.events_detected_view, 'MainWindow',
+                self.events_detected_view_text, None)
 
     def _update_detected_activity(self, activity_prediction):
-        self.activity_detected_view_text = activity_prediction
-        self.qt.set_obj_plain_text(
-            self.activity_detected_view, 'MainWindow',
-            self.activity_detected_view_text, None)
+        if self.detector.is_activity_detector_on:
+            self.activity_detected_view_text = activity_prediction
+            self.qt.set_obj_plain_text(
+                self.activity_detected_view, 'MainWindow',
+                self.activity_detected_view_text, None)
 
-        if activity_prediction == vgconf.ABNORMAL_ACTIVITY:
-            self._start_visual_alert()
+            if activity_prediction == vgconf.ABNORMAL_ACTIVITY:
+                self._start_visual_alert()
+        else:
+            self.activity_detected_view_text = activity_prediction
+            self.qt.set_obj_plain_text(
+                self.activity_detected_view, 'MainWindow',
+                self.activity_detected_view_text, None)
 
     def _update_stream_name_label(self):
         filename = 'webcam'
@@ -613,7 +633,7 @@ class DisplayScreen(object):
         if self.activity_detector_prediction:
             self._update_detected_activity(self.activity_detector_prediction)
         if self.event_detector_prediction:
-            self._update_detceted_events(self.event_detector_prediction)
+            self._update_detected_events(self.event_detector_prediction)
 
     def _start_streaming(self):
         if not self.streamer.is_closed:
