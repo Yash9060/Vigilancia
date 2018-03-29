@@ -1,6 +1,5 @@
 """Class for Unusual Activity Detector."""
 from keras import layers, models
-from keras import backend as K
 import numpy as np
 
 from core.classifiers import BaseClassifier
