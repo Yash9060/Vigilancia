@@ -1,5 +1,6 @@
 """Wrappper platform for PyQT4."""
 from PyQt4 import  QtCore, QtGui
+from PyQt4.phonon import Phonon
 
 class Qt(object):
     def __init__(self):
@@ -188,6 +189,16 @@ class Qt(object):
         file = QtGui.QFileDialog(parent_widget)
         file.setFilter(filters)
         return file
+
+    def get_phonon_media_source(self, filename):
+        return Phonon.MediaSource(filename)
+
+    def get_phonon_audio_player(self, parent_widget):
+        mediaPlayer = Phonon.MediaObject(parent_widget)
+        Phonon.createPath(
+            mediaPlayer, Phonon.AudioOutput(
+                Phonon.MusicCategory, parent_widget))
+        return mediaPlayer
 
     def connect_obj_event(self, obj, signal_name, listener):
         """Connects an event signal of given obj to a listener. A listener
