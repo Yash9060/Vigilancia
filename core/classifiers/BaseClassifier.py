@@ -39,4 +39,5 @@ class BaseClassifier(object):
 
     @abc.abstractmethod
     def close(self):
+        """This method closes the active session of the classifier"""
         pass
