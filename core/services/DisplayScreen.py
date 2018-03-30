@@ -526,6 +526,10 @@ class DisplayScreen(object):
             self.detector.enable_yolo_detection()
         else:
             self.detector.disable_yolo_detection()
+            if not self.detector.is_firearm_detector_on:
+                self.qt.set_obj_plain_text(
+                self.objects_detected_view, 'MainWindow',
+                'Objects', None)
 
     def _firearm_detection_slider_value_changed(self):
         value = self.firearm_detection_slider.value()
@@ -533,6 +537,10 @@ class DisplayScreen(object):
             self.detector.enable_firearm_detection()
         else:
             self.detector.disable_firearm_detection()
+            if not self.detector.is_yolo_on:
+                self.qt.set_obj_plain_text(
+                self.objects_detected_view, 'MainWindow',
+                'Objects', None)
 
     def _event_detection_slider_value_changed(self):
         value = self.event_detection_slider.value()
@@ -540,7 +548,9 @@ class DisplayScreen(object):
             self.detector.enable_event_detection()
         else:
             self.detector.disable_event_detection()
-            self._update_detected_events('Events')
+            self.qt.set_obj_plain_text(
+            self.events_detected_view, 'MainWindow',
+            'Events', None)
 
     def _abnormal_activity_slider_value_changed(self):
         value = self.abnormal_activity_slider.value()
@@ -548,70 +558,54 @@ class DisplayScreen(object):
             self.detector.enable_unusual_activity_detection()
         else:
             self.detector.disable_unusual_activity_detection()
-            self._update_detected_activity('Activity')
+            self.qt.set_obj_plain_text(
+            self.activity_detected_view, 'MainWindow',
+            'Activity', None)
 
     def _update_detected_objects(self, objects_prediction):
-        
-        if self.detector.is_yolo_on or self.detector.is_firearm_detector_on:
-            parsed_objects = [p['label'] for p in objects_prediction]
-            parsed_objects_dict = collections.Counter(parsed_objects)
-            detected_suspicious_objects = False
-            objects = ''
+        parsed_objects = [p['label'] for p in objects_prediction]
+        parsed_objects_dict = collections.Counter(parsed_objects)
+        detected_suspicious_objects = False
+        objects = ''
 
-            for (obj, count) in parsed_objects_dict.items():
-                objects += '%s (%d)\n' % (obj, count)
-                if obj in vgconf.SUSPICIOUS_OBJECTS_LIST:
-                    detected_suspicious_objects = True
+        for (obj, count) in parsed_objects_dict.items():
+            objects += '%s (%d)\n' % (obj, count)
+            if obj in vgconf.SUSPICIOUS_OBJECTS_LIST:
+                detected_suspicious_objects = True
 
-            self.objects_detected_view_text = objects
-            self.qt.set_obj_plain_text(
-                self.objects_detected_view, 'MainWindow',
-                self.objects_detected_view_text, None)
+        self.objects_detected_view_text = objects
+        self.qt.set_obj_plain_text(
+            self.objects_detected_view, 'MainWindow',
+            self.objects_detected_view_text, None)
 
-            # Start alert if suspicious object is detected.
-            if detected_suspicious_objects:
-                self._start_alert()
-        else:
-            self.objects_detected_view_text = 'Objects'
-            self.qt.set_obj_plain_text(
-                self.objects_detected_view, 'MainWindow',
-                self.objects_detected_view_text, None)
+        # Start alert if suspicious object is detected.
+        if detected_suspicious_objects:
+            self._start_alert()
+            
 
     def _update_detected_events(self, events_prediction):
-        if self.detector.is_event_detector_on:
-            events = ', '.join(events_prediction)
-            self.events_detected_view_text = events
-            self.qt.set_obj_plain_text(
-                self.events_detected_view, 'MainWindow',
-                self.events_detected_view_text, None)
+        events = ', '.join(events_prediction)
+        self.events_detected_view_text = events
+        self.qt.set_obj_plain_text(
+            self.events_detected_view, 'MainWindow',
+            self.events_detected_view_text, None)
 
-            detected_suspicious_events = False
-            for event in events_prediction:
-                if event in vgconf.SUSPICIOUS_EVENTS_LIST:
-                    detected_suspicious_events = True
+        detected_suspicious_events = False
+        for event in events_prediction:
+            if event in vgconf.SUSPICIOUS_EVENTS_LIST:
+                detected_suspicious_events = True
 
-            if detected_suspicious_events:
-                self._start_alert()
-        else:
-            self.events_detected_view_text = events_prediction
-            self.qt.set_obj_plain_text(
-                self.events_detected_view, 'MainWindow',
-                self.events_detected_view_text, None)
+        if detected_suspicious_events:
+            self._start_alert()
 
     def _update_detected_activity(self, activity_prediction):
-        if self.detector.is_activity_detector_on:
-            self.activity_detected_view_text = activity_prediction
-            self.qt.set_obj_plain_text(
-                self.activity_detected_view, 'MainWindow',
-                self.activity_detected_view_text, None)
+        self.activity_detected_view_text = activity_prediction
+        self.qt.set_obj_plain_text(
+            self.activity_detected_view, 'MainWindow',
+            self.activity_detected_view_text, None)
 
-            if activity_prediction == vgconf.ABNORMAL_ACTIVITY:
-                self._start_alert()
-        else:
-            self.activity_detected_view_text = activity_prediction
-            self.qt.set_obj_plain_text(
-                self.activity_detected_view, 'MainWindow',
-                self.activity_detected_view_text, None)
+        if activity_prediction == vgconf.ABNORMAL_ACTIVITY:
+            self._start_alert()
 
     def _update_stream_name_label(self):
         filename = 'webcam'
@@ -651,10 +645,11 @@ class DisplayScreen(object):
         self.detected_objects = []
         if self.objects_detector_prediction:
             self.detected_objects.extend(self.objects_detector_prediction)
+            self._update_detected_objects(self.detected_objects)
         if self.firearm_detector_prediction:
             self.detected_objects.extend(self.firearm_detector_prediction)
-
-        self._update_detected_objects(self.detected_objects)
+            self._update_detected_objects(self.detected_objects)
+            
         if self.activity_detector_prediction:
             self._update_detected_activity(self.activity_detector_prediction)
         if self.event_detector_prediction:
