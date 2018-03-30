@@ -5,6 +5,7 @@ import collections
 from core.services import SuspicionDetection
 from core.platform.opencv import VideoStream
 from core.platform.qt import qt4
+from core.platform.mongodb import mongoDbtest
 import vgconf
 
 class DisplayScreen(object): 
@@ -12,7 +13,7 @@ class DisplayScreen(object):
         self.qt = qt4.Qt()
         self.app = self.qt.get_application(args)
         self.detector = SuspicionDetection.SuspicionDetection()
-
+        # Main Window Params
         self.main_window_stylesheet = ('background-color: '
             'qradialgradient(spread:pad, cx:0.461, cy:0.0511364, '
             'radius:1.04, fx:0.461, fy:0.0511818, stop:0 '
@@ -76,6 +77,8 @@ class DisplayScreen(object):
         self.clear_button_geometry = (250, 440, 80, 34)
         self.file_selection_button_text = 'Select file to stream'
         self.file_selection_button_geometry = (30, 440, 210, 34)
+        self.login_button_text = 'Login'
+        self.login_button_geometry = (100,440,200,34)
         self.file_selection_filter = 'AVI (*.avi);;MP4 (*.mp4);;MKV (*.mkv)'
         self.file_selection_dialog_stylesheet = ('color: lightgrey;')
 
@@ -99,7 +102,12 @@ class DisplayScreen(object):
         self.date_time_label_text = 'Today\'s date and time'
         self.date_time_label_geometry = (20, 80, 271, 20)
         self.datetime_format = '%a %b %d %H:%M:%S %Z %Y'
-
+        self.uname_label_text = 'Username'
+        self.uname_label_geometry = (150, 110, 71, 20)
+        self.password_label_text = 'Password'
+        self.password_label_geometry = (150, 150, 71, 21)
+        self.uname_lineEdit_geometry = (230, 110, 113, 20)
+        self.password_lineEdit_geometry = (230, 150, 113, 20)
         self.file_name_label_stylesheet = ('color: %s;\n'
             'background-color: rgba(0, 30, 58, 150);' % self.label_color)
         self.file_name_label_text = 'stream / file name'
@@ -235,6 +243,13 @@ class DisplayScreen(object):
         self.qt.set_obj_stylesheet(obj, stylesheet)
         return obj
 
+    def add_lineEdit(
+        self, parent, name, geometry,alignment=None):
+        obj = self.qt.get_lineEdit(parent)
+        self.qt.set_obj_name(obj,name)
+        self.qt.set_obj_geometry(obj, geometry)
+        return obj
+
     def add_main_window(self, name, stylesheet, size):
         obj = self.qt.get_main_window()
         self.qt.set_obj_name(obj, name)
@@ -277,8 +292,96 @@ class DisplayScreen(object):
 
         return font
 
+    def create_login_components(self):
+
+        #Creating Main Window 
+        self.main_window = self.add_main_window(
+            'MainWindow', self.main_window_stylesheet, self.main_window_size)
+
+        # Create central widget.
+        self.central_widget = self.qt.qt_widget_wrapper(self.main_window)
+        self.qt.set_obj_name(self.central_widget, 'CentralWidget')
+
+        # Create Login widget
+        self.uname_label = self.add_label(
+            self.central_widget,'Username',self.uname_label_geometry,
+            self.label_stylesheet)
+        self.password_label = self.add_label(
+            self.central_widget,'Password',self.password_label_geometry,
+            self.label_stylesheet)
+        self.uname_lineEdit = self.add_lineEdit(
+            self.central_widget,'uname_lineEdit',self.uname_lineEdit_geometry)
+        self.password_lineEdit = self.add_lineEdit(
+            self.central_widget,'password_lineEdit',self.password_lineEdit_geometry)
+        #LoginButton
+        self.login_button = self.add_push_button(
+            self.central_widget, 'LoginButton', self.login_button_geometry,
+            self.push_button_stylesheet,self.get_font(self.default_font_family, self.push_button_point_size))
+        self.date_time_label = self.add_label(
+            self.central_widget, 'PredictionLabel',
+            self.date_time_label_geometry, self.label_stylesheet,
+            self.get_font(self.default_font_family, self.push_button_point_size))
+        self.qt.connect_obj_event(
+            self.login_button, 'clicked()', self.loginCheck)
+
+    def raise_login_ui_components(self):
+        self.uname_label.raise_()
+        self.password_label.raise_()
+        self.uname_lineEdit.raise_()
+        self.password_lineEdit.raise_()
+        self.login_button.raise_()
+        self.date_time_label.raise_()
+
+    def retranslate_Login_ui(self):
+        self.qt.set_window_title(
+            self.main_window, 'MainWindow',
+            self.vigilancia_title_label_text, None)
+        self.qt.set_obj_text(
+            self.login_button, 'MainWindow', self.login_button_text, None)
+        self.qt.set_obj_text(
+            self.uname_label, 'MainWindow',
+            self.uname_label_text, None)
+        self.qt.set_obj_text(
+            self.password_label, 'MainWindow',
+            self.password_label_text, None)
+        self.qt.set_obj_text(
+            self.date_time_label, 'MainWindow',
+            self.date_time_label_text, None)
+
+
+    def loginCheck(self):
+        username1 = self.uname_lineEdit.text()
+        password1 = self.password_lineEdit.text()
+        mongo = mongoDbtest.mongoDbtest1()
+        if(mongo.test(username1,password1)):
+            self.create_all()
+        else:
+            self.uname_lineEdit.clear()
+            self.password_lineEdit.clear()
+            
+    def create_all(self):
+        self.main_window.show()
+        self.login_button.setParent(None)
+        self.login_button.deleteLater()
+        self.uname_label.setParent(None)
+        self.uname_label.deleteLater()
+        self.password_label.setParent(None)
+        self.password_label.deleteLater()
+        self.uname_lineEdit.setParent(None)                
+        self.uname_lineEdit.deleteLater()
+        self.password_lineEdit.setParent(None)
+        self.password_lineEdit.setParent(None)
+        self.create_ui_components()
+        self.raise_ui_components()
+        self.setup_main_window_and_status_bar()
+        self.retranslate_ui()
+        self.connect_elements_to_callback()
+        self.qt.connect_slots_by_name(self.main_window)
+        self.main_window.show()
+
+
     def create_ui_components(self):
-        # Craete main window.
+        # Create main window.
         self.main_window = self.add_main_window(
             'MainWindow', self.main_window_stylesheet, self.main_window_size)
 
@@ -410,6 +513,8 @@ class DisplayScreen(object):
             self.central_widget)
         self.alert_beep_player.setCurrentSource(self.alert_beep)
 
+        #self.main_window.show()
+
     def raise_ui_components(self):
         # Raise all components on main UI.
         self.alert_window.raise_()
@@ -442,9 +547,6 @@ class DisplayScreen(object):
 
     def retranslate_ui(self):
         # Set content of various UI components.
-        self.qt.set_window_title(
-            self.main_window, 'MainWindow',
-            self.vigilancia_title_label_text, None)
         self.qt.set_obj_text(
             self.start_button, 'MainWindow', self.start_button_text, None)
         self.qt.set_obj_text(
@@ -718,14 +820,13 @@ class DisplayScreen(object):
         self.qt.connect_obj_event(
             self.alert_beep_player, 'finished()', self._audio_alert_finished)
 
-    def create_application(self):
-        self.create_ui_components()
-        self.raise_ui_components()
+    def create_login(self):
+        self.create_login_components()
+        self.raise_login_ui_components()
         self.setup_main_window_and_status_bar()
-        self.retranslate_ui()
-        self.connect_elements_to_callback()
-        self.qt.connect_slots_by_name(self.main_window)
+        self.retranslate_Login_ui()
         self.main_window.show()
+        print("Create Applications...")
 
     def _close(self):
         self.stream_timer.stop()

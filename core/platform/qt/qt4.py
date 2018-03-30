@@ -102,6 +102,9 @@ class Qt(object):
     def get_label(self, parent_widget):
         return QtGui.QLabel(parent_widget)
 
+    def get_lineEdit(self,parent_widget):
+        return QtGui.QLineEdit(parent_widget)
+
     def set_label_scaled_content(self, label, scaled_content):
         label.setScaledContents(scaled_content)
         return label
