@@ -27,10 +27,10 @@ DEFAULT_FIREARM_DETECTOR = 'FirearmDetector'
 DEFAULT_EVENT_DETECTOR = 'EventDetector'
 
 # Classifier constants.
-ACTIVITY_DETECTION_THRESHOLD = 0.7
+ACTIVITY_DETECTION_THRESHOLD = 0.95
 EVENT_DETECTION_TOP_COUNT = 3
 YOLO_THRESHOLD = 0.25
-FIREARM_DETECTION_THRESHOLD = 0.30
+FIREARM_DETECTION_THRESHOLD = 0.45
 
 # Normal and Abnormal Activity prediction strings.
 ABNORMAL_ACTIVITY = 'Abnormal Activity'
@@ -43,9 +43,9 @@ DEFAULT_ALERT_FLASH_COUNT = 8
 # Suspicious objects.
 SUSPICIOUS_OBJECTS_LIST = ['pistol', 'knife']
 SUSPICIOUS_EVENTS_LIST = [
-	'Parade' ,'People_Marching' ,'Riot' ,'Raid',' Traffic' ,'Car_Racin' ,
-	'Car_Accident' ,'Soldier_Firing' ,'Soldier_Patrol' ,'Soldier_Drilling' ,
-	'Street_Battle']
+    'Parade' ,'People_Marching' ,'Riot' ,'Raid',' Traffic' ,'Car_Racin' ,
+    'Car_Accident' ,'Soldier_Firing' ,'Soldier_Patrol' ,'Soldier_Drilling' ,
+    'Street_Battle']
 SUSPICIOUS_ACTIVITY = ABNORMAL_ACTIVITY
 
 # Audio alert file.
