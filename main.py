@@ -7,5 +7,5 @@ import sys
 
 if __name__ == '__main__':
     dsp = DisplayScreen.DisplayScreen(sys.argv)
-    dsp.create_application()
+    dsp.create_login()
     sys.exit(dsp.start_app())
