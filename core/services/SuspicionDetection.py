@@ -108,23 +108,51 @@ class SuspicionDetection(object):
         self.is_firearm_detector_on = True
 
     def _remove_inception(self):
-        pass
+        if not self.is_inception_on:
+            return
+        self.is_inception_on = False
+        self.inception.close()
+        self.inception_buffer = []
+        self.inception_inference_buffer = []
+        self.inception = None
 
     def _remove_event_detector(self):
         if not self.is_activity_detector_on:
             self._remove_inception()
-        pass
+        self.is_event_detector_on = False
+        self.event_detector.close()
+        self.event_detector_buffer=[]
+        self.event_detector_inference_buffer=[]
+        self.event_detector = None
 
     def _remove_unusual_activity_detector(self):
         if not self.is_event_detector_on:
             self._remove_inception()
-        pass
+        self.is_activity_detector_on=False
+        self.activity_detector.close()
+        self.activity_detector_buffer=[]
+        self.activity_detector_inference_buffer=[]
+        self.activity_detector = None
 
     def _remove_yolo_classifier(self):
-        pass
+        if not self.is_yolo_on:
+            return
+        self.is_yolo_on = False
+        self.yolo.close()
+        self.yolo_inference_buffer=[]
+        self.yolo_buffer=[]
+        self.yolo = None
+
 
     def _remove_firearm_detector(self):
-        pass
+        if not self.is_firearm_detector_on:
+            return
+        self.is_firearm_detector_on = False
+        self.firearm_detector.close()
+        self.firearm_detector_buffer=[]
+        self.firearm_detector_inference_buffer=[]
+        self.firearm_detector = None
+
 
     def enable_unusual_activity_detection(self):
         if self.is_activity_detector_on:

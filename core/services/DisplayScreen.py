@@ -628,6 +628,10 @@ class DisplayScreen(object):
             self.detector.enable_yolo_detection()
         else:
             self.detector.disable_yolo_detection()
+            if not self.detector.is_firearm_detector_on:
+                self.qt.set_obj_plain_text(
+                self.objects_detected_view, 'MainWindow',
+                'Objects', None)
 
     def _firearm_detection_slider_value_changed(self):
         value = self.firearm_detection_slider.value()
@@ -635,6 +639,10 @@ class DisplayScreen(object):
             self.detector.enable_firearm_detection()
         else:
             self.detector.disable_firearm_detection()
+            if not self.detector.is_yolo_on:
+                self.qt.set_obj_plain_text(
+                self.objects_detected_view, 'MainWindow',
+                'Objects', None)
 
     def _event_detection_slider_value_changed(self):
         value = self.event_detection_slider.value()
@@ -642,6 +650,9 @@ class DisplayScreen(object):
             self.detector.enable_event_detection()
         else:
             self.detector.disable_event_detection()
+            self.qt.set_obj_plain_text(
+            self.events_detected_view, 'MainWindow',
+            'Events', None)
 
     def _abnormal_activity_slider_value_changed(self):
         value = self.abnormal_activity_slider.value()
@@ -649,6 +660,9 @@ class DisplayScreen(object):
             self.detector.enable_unusual_activity_detection()
         else:
             self.detector.disable_unusual_activity_detection()
+            self.qt.set_obj_plain_text(
+            self.activity_detected_view, 'MainWindow',
+            'Activity', None)
 
     def _update_detected_objects(self, objects_prediction):
         parsed_objects = [p['label'] for p in objects_prediction]
@@ -669,8 +683,9 @@ class DisplayScreen(object):
         # Start alert if suspicious object is detected.
         if detected_suspicious_objects:
             self._start_alert()
+            
 
-    def _update_detceted_events(self, events_prediction):
+    def _update_detected_events(self, events_prediction):
         events = ', '.join(events_prediction)
         self.events_detected_view_text = events
         self.qt.set_obj_plain_text(
@@ -732,14 +747,15 @@ class DisplayScreen(object):
         self.detected_objects = []
         if self.objects_detector_prediction:
             self.detected_objects.extend(self.objects_detector_prediction)
+            self._update_detected_objects(self.detected_objects)
         if self.firearm_detector_prediction:
             self.detected_objects.extend(self.firearm_detector_prediction)
-
-        self._update_detected_objects(self.detected_objects)
+            self._update_detected_objects(self.detected_objects)
+            
         if self.activity_detector_prediction:
             self._update_detected_activity(self.activity_detector_prediction)
         if self.event_detector_prediction:
-            self._update_detceted_events(self.event_detector_prediction)
+            self._update_detected_events(self.event_detector_prediction)
 
     def _start_streaming(self):
         if not self.streamer.is_closed:

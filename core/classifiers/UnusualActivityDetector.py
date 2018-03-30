@@ -36,3 +36,6 @@ class UnusualActivityDetector(BaseClassifier.BaseClassifier):
     def predict(self, frame):
         predictions = self.model.predict(np.expand_dims(frame, 0))[0]
         return self.get_class_name(predictions)
+
+    def close(self):
+        pass

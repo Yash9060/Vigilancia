@@ -36,3 +36,8 @@ class BaseClassifier(object):
     def predict(self, inputs):
         """This method performs and returns the prediction."""
         pass
+
+    @abc.abstractmethod
+    def close(self):
+        """This method closes the active session of the classifier"""
+        pass
