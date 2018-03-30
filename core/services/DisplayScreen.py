@@ -551,7 +551,6 @@ class DisplayScreen(object):
             self._update_detected_activity('Activity')
 
     def _update_detected_objects(self, objects_prediction):
-        
         if self.detector.is_yolo_on or self.detector.is_firearm_detector_on:
             parsed_objects = [p['label'] for p in objects_prediction]
             parsed_objects_dict = collections.Counter(parsed_objects)
