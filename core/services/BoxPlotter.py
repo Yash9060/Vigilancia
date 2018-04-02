@@ -14,6 +14,8 @@ class BoxPlotter(object):
     def add_labels(self, labels):
         self.labels.extend(labels)
         self.n_classes = len(self.labels)
+        self._generate_colors()
+        self._generate_labels_to_colors()
 
     def _generate_colors(self):
         base = int(math.ceil(pow(self.n_classes, 1.0/3)))
